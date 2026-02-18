@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Menu, X, Flame } from "lucide-react";
 
 const Header = () => {
@@ -25,16 +26,15 @@ const Header = () => {
         >
             <div className="max-w-[1440px] mx-auto px-8 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex flex-col items-center group">
-                    <div className="text-[#FF1F1F] group-hover:scale-110 transition-transform duration-300">
-                        {/* Using a custom SVG to match the 'red wings' look conceptually */}
-                        <svg width="32" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2.00018 9.87784C2.26629 8.5262 4.14856 2.00003 11.9996 2C19.8507 2.00003 21.7329 8.52623 21.999 9.87787C22.0494 10.1332 21.9463 10.3951 21.7326 10.5376L11.9996 17.0263L2.2666 10.5376C2.05291 10.3951 1.94978 10.1332 2.00018 9.87784Z" fill="#DC2626" />
-                            <path d="M12 14L8 11L12 6L16 11L12 14Z" fill="white" />
-                        </svg>
-                    </div>
-                    <div className="flex flex-col items-center mt-1">
-                        <span className="text-[8px] font-black text-[#FF1F1F] tracking-[0.2em] leading-none">ARIZONA HIGH</span>
+                <Link href="/" className="flex items-center group">
+                    <div className="relative w-32 h-8 group-hover:scale-105 transition-transform duration-300">
+                        <Image
+                            src="/assets/logo.png"
+                            alt="Arizona High Logo"
+                            fill
+                            className="object-contain"
+                            priority
+                        />
                     </div>
                 </Link>
 
@@ -53,10 +53,10 @@ const Header = () => {
 
                 {/* Auth Buttons */}
                 <div className="hidden md:flex items-center space-x-8">
-                    <Link href="/login" className="text-[10px] font-bold tracking-[0.15em] text-[#9FB0C7] hover:text-white transition-colors uppercase">
+                    <Link href="/login" className="text-[9px] font-bold tracking-[0.15em] text-[#9FB0C7] hover:text-white transition-colors uppercase">
                         SIGN IN
                     </Link>
-                    <Link href="/signup" className="bg-[#2F80FF] hover:bg-[#2563EB] text-white px-8 py-3 rounded-lg text-[10px] font-black tracking-[0.15em] uppercase shadow-[0_0_20px_rgba(47,128,255,0.3)] hover:shadow-[0_0_30px_rgba(47,128,255,0.5)] transition-all">
+                    <Link href="/signup" className="bg-[#2F80FF] hover:bg-[#2563EB] text-white px-6 py-2.5 rounded-lg text-[9px] font-black tracking-[0.15em] uppercase shadow-[0_0_20px_rgba(47,128,255,0.3)] hover:shadow-[0_0_30px_rgba(47,128,255,0.5)] transition-all">
                         GET STARTED
                     </Link>
                 </div>

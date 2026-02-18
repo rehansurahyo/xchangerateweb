@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Shield } from "lucide-react";
 
 const Footer = () => {
@@ -10,13 +11,15 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
                     {/* Brand Info */}
                     <div className="space-y-6">
-                        <Link href="/" className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-[#FF1F1F] rounded-full flex items-center justify-center">
-                                <span className="text-white font-bold text-lg italic">A</span>
+                        <Link href="/" className="flex items-center group">
+                            <div className="relative w-32 h-8 group-hover:scale-105 transition-transform duration-300">
+                                <Image
+                                    src="/assets/logo.png"
+                                    alt="Arizona High Logo"
+                                    fill
+                                    className="object-contain"
+                                />
                             </div>
-                            <span className="text-white font-bold tracking-tight text-xl">
-                                ARIZONA HIGH
-                            </span>
                         </Link>
                         <p className="text-[#9FB0C7] text-sm leading-relaxed max-w-[280px]">
                             Institutional-grade AI futures trading. Verified performance, transparent results.

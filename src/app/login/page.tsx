@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 
 export default function LoginPage() {
@@ -32,7 +33,11 @@ export default function LoginPage() {
             });
 
             if (res?.error) {
-                setError(res.error);
+                if (res.error.includes("Email not confirmed")) {
+                    setError("Email not confirmed. Please check your inbox or spam folder.");
+                } else {
+                    setError(res.error);
+                }
             } else {
                 router.push("/dashboard");
             }
@@ -53,15 +58,14 @@ export default function LoginPage() {
 
             {/* Logo Section */}
             <div className="mb-10 flex flex-col items-center group">
-                <div className="text-[#FF1F1F] mb-3">
-                    <svg width="64" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.00018 9.87784C2.26629 8.5262 4.14856 2.00003 11.9996 2C19.8507 2.00003 21.7329 8.52623 21.999 9.87787C22.0494 10.1332 21.9463 10.3951 21.7326 10.5376L11.9996 17.0263L2.2666 10.5376C2.05291 10.3951 1.94978 10.1332 2.00018 9.87784Z" fill="#DC2626" />
-                        <path d="M12 14L8 11L12 6L16 11L12 14Z" fill="white" />
-                    </svg>
-                </div>
-                <div className="flex flex-col items-center">
-                    <span className="text-xs font-black text-white tracking-[0.3em] uppercase">ARIZONA HIGH</span>
-                    <span className="text-[8px] font-bold text-[#9FB0C7]/60 tracking-[0.2em] uppercase mt-1">THINK AI</span>
+                <div className="relative w-48 h-12 mb-3">
+                    <Image
+                        src="/assets/logo.png"
+                        alt="Arizona High Logo"
+                        fill
+                        className="object-contain"
+                        priority
+                    />
                 </div>
             </div>
 

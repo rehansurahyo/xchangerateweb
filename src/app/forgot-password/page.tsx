@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Mail, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 
 export default function ForgotPassword() {
@@ -70,12 +71,15 @@ export default function ForgotPassword() {
             {/* Main Card */}
             <div className="glass-card w-full max-w-[500px] p-10 duration-500">
                 <div className="flex flex-col items-center text-center space-y-6 mb-8">
-                    {/* Logo Placeholder - Using text if no image available, or a generic icon */}
-                    <div className="w-16 h-16 relative flex items-center justify-center mb-2">
-                        {/* Replace with actual logo if available, for now using a styled icon/text match */}
-                        <div className="text-4xl">
-                            🦁
-                        </div>
+                    {/* Logo Section */}
+                    <div className="w-32 h-8 relative flex items-center justify-center mb-2">
+                        <Image
+                            src="/assets/logo.png"
+                            alt="Arizona High Logo"
+                            fill
+                            className="object-contain"
+                            priority
+                        />
                     </div>
 
                     <h1 className="text-3xl font-extrabold text-white tracking-tight">

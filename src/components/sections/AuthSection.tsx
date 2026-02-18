@@ -31,7 +31,11 @@ const AuthSection = () => {
             });
 
             if (res?.error) {
-                setError(res.error);
+                if (res.error.includes("Email not confirmed")) {
+                    setError("Email not confirmed. Please check your inbox or spam folder.");
+                } else {
+                    setError(res.error);
+                }
             } else {
                 router.push("/dashboard");
             }

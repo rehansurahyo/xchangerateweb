@@ -1,9 +1,15 @@
 "use client";
 
 import { User, Shield, CreditCard, Pencil, BadgeCheck, TrendingUp, History, Globe } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { MOCK_USER } from "@/lib/mock";
 
 export default function ProfilePage() {
+    const { data: session } = useSession();
+
+    const userEmail = session?.user?.email || MOCK_USER.email;
+    const userName = session?.user?.name || MOCK_USER.username;
+    const userInitials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || MOCK_USER.initials;
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex items-center justify-between">
@@ -19,15 +25,15 @@ export default function ProfilePage() {
                 <div className="lg:col-span-2 space-y-8">
                     <div className="glass-card p-10 flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-10">
                         <div className="w-32 h-32 rounded-full bg-primary/20 border-4 border-[#050A12] flex items-center justify-center text-primary text-4xl font-black shadow-[0_0_30px_rgba(47,128,255,0.2)]">
-                            {MOCK_USER.initials}
+                            {userInitials}
                         </div>
                         <div className="flex-1 text-center md:text-left space-y-4">
                             <div>
                                 <div className="flex items-center justify-center md:justify-start space-x-2">
-                                    <h3 className="text-2xl font-black text-white uppercase tracking-tight">{MOCK_USER.username}</h3>
+                                    <h3 className="text-2xl font-black text-white uppercase tracking-tight">{userName}</h3>
                                     <BadgeCheck size={20} className="text-primary" />
                                 </div>
-                                <p className="text-[#9FB0C7]/60 font-medium">{MOCK_USER.email}</p>
+                                <p className="text-[#9FB0C7]/60 font-medium">{userEmail}</p>
                             </div>
                             <div className="flex flex-wrap justify-center md:justify-start gap-3">
                                 <span className="px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/5 text-[10px] font-black text-[#9FB0C7] uppercase tracking-widest flex items-center space-x-2">

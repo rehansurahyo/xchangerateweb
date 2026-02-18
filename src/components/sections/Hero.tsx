@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { MessageSquare, Award, ArrowRight } from "lucide-react";
 
 const Hero = () => {
@@ -10,8 +11,14 @@ const Hero = () => {
 
             {/* Brand Icon */}
             <div className="mb-10 flex justify-center">
-                <div className="w-16 h-16 bg-[#FF1F1F] rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(255,31,31,0.3)]">
-                    <span className="text-white font-bold text-3xl italic">A</span>
+                <div className="relative w-48 h-12 group hover:scale-105 transition-transform duration-300">
+                    <Image
+                        src="/assets/logo.png"
+                        alt="Arizona High Logo"
+                        fill
+                        className="object-contain"
+                        priority
+                    />
                 </div>
             </div>
 

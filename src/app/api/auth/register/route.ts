@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         if (data.user && !data.session) {
             return NextResponse.json({
                 user: data.user,
-                message: "Account created! Please check your email to confirm your account before logging in."
+                message: "Account created! IMPORTANT: Please check your email and click the confirmation link before logging in."
             }, { status: 200 });
         }
 
