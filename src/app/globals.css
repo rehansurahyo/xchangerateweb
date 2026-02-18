@@ -15,9 +15,25 @@
 body {
     background: radial-gradient(circle at center, var(--background-end) 0%, var(--background-start) 100%);
     color: var(--body);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     min-height: 100vh;
     margin: 0;
+    font-size: 14px;
+}
+
+@layer base {
+    h1 {
+        font-size: clamp(40px, 6vw, 64px);
+        @apply leading-[1.1] tracking-tighter font-bold;
+    }
+
+    h2 {
+        @apply text-2xl md:text-3xl font-extrabold tracking-tight;
+    }
+
+    h3 {
+        @apply text-xl md:text-2xl font-bold tracking-tight;
+    }
 }
 
 @layer components {
@@ -26,7 +42,7 @@ body {
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid var(--border);
-        border-radius: 24px;
+        border-radius: 12px;
         transition: all 0.3s ease-in-out;
     }
 
@@ -39,9 +55,10 @@ body {
     .btn-primary {
         background: var(--primary);
         color: white;
-        padding: 0.75rem 2rem;
-        border-radius: 9999px;
+        padding: 8px 16px;
+        border-radius: 10px;
         font-weight: 600;
+        font-size: 14px;
         transition: all 0.3s ease;
         box-shadow: 0 4px 14px 0 rgba(47, 128, 255, 0.39);
     }
@@ -53,7 +70,7 @@ body {
     }
 
     .text-gradient {
-        background: linear-gradient(to right, #2F80FF, #22D3A6);
+        background: linear-gradient(to right, #60A5FA, #22D3EE, #34D399);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;

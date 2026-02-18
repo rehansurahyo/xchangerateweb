@@ -53,20 +53,20 @@ const LiveCommunity = () => {
     ];
 
     return (
-        <section id="community" className="py-[100px] px-6 text-center">
-            <div className="max-w-[1240px] mx-auto">
+        <section id="community" className="py-12 px-6 text-center">
+            <div className="max-w-[1200px] mx-auto">
                 {/* Section Header */}
-                <div className="flex flex-col items-center mb-16">
-                    <div className="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
+                <div className="flex flex-col items-center mb-8">
+                    <div className="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mb-4">
                         <MessageSquare size={14} className="text-primary" />
                         <span className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase">
                             LIVE TRADING FLOOR
                         </span>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-[#F5F7FF] mb-6">
+                    <h2 className="text-[#F5F7FF] mb-4">
                         Live Community
                     </h2>
-                    <p className="max-w-[700px] text-[#9FB0C7] text-lg leading-relaxed">
+                    <p className="max-w-[700px] text-[#9FB0C7] text-[15px] leading-relaxed">
                         Real-time trade wins, AI signal alerts, system updates, and strategy discussions from active traders worldwide.
                     </p>
                 </div>

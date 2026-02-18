@@ -21,13 +21,13 @@ const Header = () => {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled ? "bg-[#050A12]/90 backdrop-blur-md border-white/5 py-4" : "bg-[#050A12] border-white/5 py-6"
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled ? "bg-[#050A12]/90 backdrop-blur-md border-white/5 h-[60px]" : "bg-[#050A12] border-white/5 h-[60px]"
                 }`}
         >
-            <div className="max-w-[1440px] mx-auto px-8 flex items-center justify-between">
+            <div className="max-w-[1200px] mx-auto h-full px-6 flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center group">
-                    <div className="relative w-32 h-8 group-hover:scale-105 transition-transform duration-300">
+                    <div className="relative w-24 h-[26px] group-hover:scale-105 transition-transform duration-300">
                         <Image
                             src="/assets/logo.png"
                             alt="Arizona High Logo"
@@ -39,12 +39,12 @@ const Header = () => {
                 </Link>
 
                 {/* Desktop Nav */}
-                <nav className="hidden md:flex items-center space-x-12">
+                <nav className="hidden md:flex items-center space-x-6">
                     {navItems.map((item) => (
                         <Link
                             key={item}
                             href={`#${item.toLowerCase().replace(/ /g, "-")}`}
-                            className="text-[10px] font-bold tracking-[0.15em] text-[#9FB0C7] hover:text-white transition-colors uppercase"
+                            className="text-[12px] font-medium tracking-tight text-[#9FB0C7] hover:text-white transition-colors"
                         >
                             {item}
                         </Link>
@@ -52,11 +52,11 @@ const Header = () => {
                 </nav>
 
                 {/* Auth Buttons */}
-                <div className="hidden md:flex items-center space-x-8">
-                    <Link href="/login" className="text-[9px] font-bold tracking-[0.15em] text-[#9FB0C7] hover:text-white transition-colors uppercase">
+                <div className="hidden md:flex items-center space-x-5">
+                    <Link href="/login" className="text-[12px] font-medium text-[#9FB0C7] hover:text-white transition-colors">
                         SIGN IN
                     </Link>
-                    <Link href="/signup" className="bg-[#2F80FF] hover:bg-[#2563EB] text-white px-6 py-2.5 rounded-lg text-[9px] font-black tracking-[0.15em] uppercase shadow-[0_0_20px_rgba(47,128,255,0.3)] hover:shadow-[0_0_30px_rgba(47,128,255,0.5)] transition-all">
+                    <Link href="/signup" className="btn-primary flex items-center h-9 px-4 !rounded-lg text-[12px]">
                         GET STARTED
                     </Link>
                 </div>

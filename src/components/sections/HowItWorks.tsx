@@ -31,35 +31,39 @@ const HowItWorks = () => {
     ];
 
     return (
-        <section id="how-it-works" className="py-[100px] px-6">
-            <div className="max-w-[1240px] mx-auto">
+        <section id="how-it-works" className="py-10 px-6">
+            <div className="max-w-[900px] mx-auto">
                 {/* Section Header */}
-                <div className="flex flex-col items-center text-center mb-16">
-                    <div className="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
-                        <Settings size={14} className="text-primary" />
-                        <span className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase">
+                <div className="flex flex-col items-center text-center mb-8">
+                    <div className="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5 mb-3">
+                        <Settings size={12} className="text-primary" />
+                        <span className="text-[9px] font-bold tracking-[0.2em] text-primary uppercase">
                             HOW IT WORKS
                         </span>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-[#F5F7FF] mb-6">
+                    <h2 className="text-[#F5F7FF] mb-3">
                         Built for Serious Traders
                     </h2>
-                    <p className="max-w-[700px] text-[#9FB0C7] text-lg leading-relaxed">
+                    <p className="max-w-[600px] text-[#9FB0C7] text-[13px] leading-relaxed">
                         Institutional infrastructure meets intelligent automation. Every feature is engineered for performance, transparency, and trust.
                     </p>
                 </div>
 
                 {/* Features Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {features.map((feature, idx) => (
-                        <div key={idx} className="glass-card p-10 flex flex-col items-start group">
-                            <div className={`w-14 h-14 rounded-2xl ${feature.iconBg} flex items-center justify-center mb-8 border border-white/5 group-hover:scale-110 transition-transform`}>
-                                {feature.icon}
+                        <div key={idx} className="glass-card p-6 flex flex-col items-start group">
+                            <div className={`w-10 h-10 rounded-lg ${feature.iconBg} flex items-center justify-center mb-5 border border-white/5 group-hover:scale-110 transition-transform`}>
+                                {feature.icon ? (
+                                    <div className="scale-[0.8]">
+                                        {feature.icon}
+                                    </div>
+                                ) : null}
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-6 tracking-tight">
+                            <h3 className="text-white text-base mb-3 tracking-tight">
                                 {feature.title}
                             </h3>
-                            <p className="text-[#9FB0C7] text-base leading-relaxed opacity-90">
+                            <p className="text-[#9FB0C7] text-[13px] leading-relaxed opacity-90">
                                 {feature.desc}
                             </p>
                         </div>

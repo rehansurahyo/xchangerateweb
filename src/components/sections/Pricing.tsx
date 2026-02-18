@@ -51,20 +51,20 @@ const Pricing = () => {
     ];
 
     return (
-        <section id="pricing" className="py-[100px] px-6">
-            <div className="max-w-[1240px] mx-auto">
+        <section id="pricing" className="py-12 px-6">
+            <div className="max-w-[900px] mx-auto">
                 {/* Section Header */}
-                <div className="flex flex-col items-center text-center mb-20">
-                    <div className="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
-                        <Zap size={14} className="text-primary" />
+                <div className="flex flex-col items-center text-center mb-10">
+                    <div className="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-2.5 py-0.5 mb-3">
+                        <Zap size={13} className="text-primary" />
                         <span className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase">
                             PLANS
                         </span>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-[#F5F7FF] mb-6">
+                    <h2 className="text-[#F5F7FF] mb-4">
                         Simple, Transparent Pricing
                     </h2>
-                    <p className="max-w-[700px] text-[#9FB0C7] text-lg leading-relaxed">
+                    <p className="max-w-[700px] text-[#9FB0C7] text-[15px] leading-relaxed">
                         Choose the plan that matches your trading volume. Upgrade or downgrade anytime — no long-term contracts.
                     </p>
                 </div>
@@ -74,41 +74,41 @@ const Pricing = () => {
                     {plans.map((plan, idx) => (
                         <div
                             key={idx}
-                            className={`glass-card p-10 flex flex-col relative transition-all duration-500 overflow-hidden ${plan.primary ? "border-primary/40 shadow-[0_0_40px_rgba(47,128,255,0.1)] scale-105 z-10" : ""
+                            className={`glass-card p-8 flex flex-col relative transition-all duration-500 overflow-hidden ${plan.primary ? "border-primary/40 shadow-[0_0_40px_rgba(47,128,255,0.1)] scale-105 z-10" : ""
                                 }`}
                         >
                             {plan.popular && (
-                                <div className="absolute top-6 right-6">
-                                    <div className="bg-primary/20 border border-primary/30 rounded-full px-3 py-1">
-                                        <span className="text-[10px] font-black tracking-widest text-primary uppercase">
+                                <div className="absolute top-4 right-4">
+                                    <div className="bg-primary/20 border border-primary/30 rounded-full px-2 py-0.5">
+                                        <span className="text-[9px] font-bold tracking-widest text-primary uppercase">
                                             POPULAR
                                         </span>
                                     </div>
                                 </div>
                             )}
 
-                            <div className="mb-10">
+                            <div className="mb-8">
                                 <div className="flex items-center space-x-3 mb-4">
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${plan.primary ? "bg-primary/10" : "bg-white/5"}`}>
-                                        <Zap size={16} className={plan.primary ? "text-primary" : "text-[#9FB0C7]"} />
+                                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${plan.primary ? "bg-primary/10" : "bg-white/5"}`}>
+                                        <Zap size={14} className={plan.primary ? "text-primary" : "text-[#9FB0C7]"} />
                                     </div>
-                                    <h3 className="text-xl font-bold text-white tracking-tight">
+                                    <h3 className="text-white tracking-tight">
                                         {plan.name}
                                     </h3>
                                 </div>
                                 <div className="flex items-baseline space-x-1">
-                                    <span className="text-5xl font-black text-white leading-none">${plan.price}</span>
-                                    <span className="text-[#9FB0C7] font-semibold">/mo</span>
+                                    <span className="text-4xl font-bold text-white leading-none">${plan.price}</span>
+                                    <span className="text-[#9FB0C7] text-sm font-semibold">/mo</span>
                                 </div>
                             </div>
 
-                            <div className="space-y-4 mb-12 flex-1">
+                            <div className="space-y-2.5 mb-8 flex-1">
                                 {plan.features.map((feature, fIdx) => (
-                                    <div key={fIdx} className="flex items-center space-x-3 group">
-                                        <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${plan.primary ? "bg-primary/10" : "bg-white/5"}`}>
-                                            <Check size={12} className={plan.primary ? "text-primary" : "text-[#9FB0C7]"} />
+                                    <div key={fIdx} className="flex items-center space-x-2 group">
+                                        <div className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${plan.primary ? "bg-primary/10" : "bg-white/5"}`}>
+                                            <Check size={10} className={plan.primary ? "text-primary" : "text-[#9FB0C7]"} />
                                         </div>
-                                        <span className="text-sm font-medium text-[#9FB0C7] group-hover:text-white transition-colors">
+                                        <span className="text-[11px] font-medium text-[#9FB0C7] group-hover:text-white transition-colors">
                                             {feature}
                                         </span>
                                     </div>
@@ -116,9 +116,9 @@ const Pricing = () => {
                             </div>
 
                             <button
-                                className={`w-full py-4 rounded-xl font-bold tracking-widest text-xs transition-all ${plan.primary
-                                        ? "btn-primary"
-                                        : "bg-white/5 border border-white/10 text-[#9FB0C7] hover:bg-white/10 hover:text-white hover:border-white/20"
+                                className={`w-full h-10 rounded-lg font-bold tracking-widest text-[11px] transition-all ${plan.primary
+                                    ? "btn-primary"
+                                    : "bg-white/5 border border-white/10 text-[#9FB0C7] hover:bg-white/10 hover:text-white hover:border-white/20"
                                     }`}
                             >
                                 {plan.buttonText}

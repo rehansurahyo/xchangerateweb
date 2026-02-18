@@ -57,20 +57,20 @@ const LiveRankings = () => {
     ];
 
     return (
-        <section id="performance" className="py-[100px] px-6">
-            <div className="max-w-[1240px] mx-auto">
+        <section id="performance" className="py-12 px-6">
+            <div className="max-w-[1000px] mx-auto">
                 {/* Section Header */}
-                <div className="flex flex-col items-center text-center mb-16">
-                    <div className="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
-                        <TrendingUp size={14} className="text-primary" />
+                <div className="flex flex-col items-center text-center mb-10">
+                    <div className="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-2.5 py-0.5 mb-4">
+                        <TrendingUp size={13} className="text-primary" />
                         <span className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase">
                             LIVE RANKINGS
                         </span>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-[#F5F7FF] mb-6">
+                    <h2 className="text-[#F5F7FF] mb-4">
                         Top Performing Accounts
                     </h2>
-                    <p className="max-w-[700px] text-[#9FB0C7] text-lg leading-relaxed">
+                    <p className="max-w-[600px] text-[#9FB0C7] text-[14px] leading-relaxed">
                         Real-time performance rankings based on verified trading across all connected exchanges.
                     </p>
                 </div>
@@ -78,28 +78,28 @@ const LiveRankings = () => {
                 {/* Rankings Table */}
                 <div className="glass-card overflow-hidden">
                     <div className="overflow-x-auto custom-scrollbar">
-                        <table className="w-full text-left border-collapse min-w-[800px]">
+                        <table className="w-full text-left border-collapse min-w-[700px]">
                             <thead className="bg-white/5 border-b border-white/5">
                                 <tr>
-                                    <th className="px-8 py-5 text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase w-20 text-center">
+                                    <th className="px-5 py-3.5 text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase w-14 text-center">
                                         #
                                     </th>
-                                    <th className="px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
+                                    <th className="px-4 py-3.5 text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
                                         ACCOUNT
                                     </th>
-                                    <th className="px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
+                                    <th className="px-4 py-3.5 text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
                                         ROI %
                                     </th>
-                                    <th className="px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
+                                    <th className="px-4 py-3.5 text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
                                         WIN RATE
                                     </th>
-                                    <th className="px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
+                                    <th className="px-4 py-3.5 text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
                                         DRAWDOWN
                                     </th>
-                                    <th className="px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
+                                    <th className="px-4 py-3.5 text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
                                         PROFIT
                                     </th>
-                                    <th className="px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
+                                    <th className="px-4 py-3.5 text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
                                         SESSION
                                     </th>
                                 </tr>
@@ -107,44 +107,43 @@ const LiveRankings = () => {
                             <tbody className="divide-y divide-white/5">
                                 {rankings.map((row) => (
                                     <tr key={row.rank} className="hover:bg-white/[0.02] transition-colors group">
-                                        <td className="px-8 py-6 text-center">
+                                        <td className="px-5 py-3 text-center">
                                             <div className="flex justify-center">
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black ${row.rank === 1 ? "bg-primary text-white shadow-[0_0_15px_rgba(47,128,255,0.4)]" :
-                                                        "bg-white/5 text-[#9FB0C7]"
+                                                <div className={`w-6.5 h-6.5 rounded-full flex items-center justify-center text-[10px] font-black ${row.rank === 1 ? "bg-primary text-white shadow-[0_0_15px_rgba(47,128,255,0.4)]" :
+                                                    "bg-white/5 text-[#9FB0C7]"
                                                     }`}>
                                                     {row.rank}
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6">
-                                            <div className="flex items-center space-x-3">
-                                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 group-hover:border-primary/40 transition-colors" />
-                                                <span className="text-sm font-bold text-white mb-0.5">{row.account}</span>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center space-x-2.5">
+                                                <div className="w-6.5 h-6.5 rounded-full bg-white/5 border border-white/10 group-hover:border-primary/40 transition-colors" />
+                                                <span className="text-[12px] font-bold text-white mb-0.5">{row.account}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6">
-                                            <span className="text-sm font-black text-[#22D3A6] tracking-tight">{row.roi}</span>
+                                        <td className="px-4 py-3">
+                                            <span className="text-[12px] font-black text-[#10B981] tracking-tight">{row.roi}</span>
                                         </td>
-                                        <td className="px-6 py-6">
-                                            <span className="text-sm font-bold text-white">{row.winRate}</span>
+                                        <td className="px-4 py-3">
+                                            <span className="text-[12px] font-bold text-white">{row.winRate}</span>
                                         </td>
-                                        <td className="px-6 py-6">
-                                            <div className="flex items-center space-x-2">
-                                                <span className="text-sm font-bold text-white">{row.drawdown}</span>
-                                                <div className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider ${row.risk === "HIGH" ? "bg-[#FF1F1F]/10 text-[#FF1F1F]" :
-                                                        row.risk === "MED" ? "bg-[#FFB800]/10 text-[#FFB800]" :
-                                                            "bg-[#22D3A6]/10 text-[#22D3A6]"
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center space-x-1.5">
+                                                <span className="text-[12px] font-bold text-white">{row.drawdown}</span>
+                                                <div className={`text-[8px] font-black px-1.2 py-0.2 rounded uppercase tracking-wider ${row.risk === "HIGH" ? "bg-[#FF1F1F]/10 text-[#FF1F1F]" :
+                                                    row.risk === "MED" ? "bg-[#FFB800]/10 text-[#FFB800]" :
+                                                        "bg-[#10B981]/10 text-[#10B981]"
                                                     }`}>
                                                     {row.risk}
                                                 </div>
-                                                {row.risk === "HIGH" && <AlertTriangle size={12} className="text-[#FF1F1F]" />}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6">
-                                            <span className="text-sm font-black text-[#22D3A6] tracking-tight">{row.profit}</span>
+                                        <td className="px-4 py-3">
+                                            <span className="text-[12px] font-black text-[#10B981] tracking-tight">{row.profit}</span>
                                         </td>
-                                        <td className="px-6 py-6">
-                                            <span className="text-xs font-bold text-[#9FB0C7] tracking-wider uppercase opacity-80">{row.session}</span>
+                                        <td className="px-4 py-3">
+                                            <span className="text-[10px] font-bold text-[#9FB0C7] tracking-wider uppercase opacity-80">{row.session}</span>
                                         </td>
                                     </tr>
                                 ))}

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import AuthProvider from "@/components/providers/AuthProvider";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const plusJakartaSans = Plus_Jakarta_Sans({
+    subsets: ["latin"],
+    weight: ['400', '500', '600', '700', '800']
+});
 
 export const metadata: Metadata = {
     title: "Arizona High | World's Most Profitable Futures AI AutoTrader",
@@ -18,7 +21,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className="dark">
-            <body className={inter.className}>
+            <body className={plusJakartaSans.className}>
                 <AuthProvider>
                     <DashboardLayout>{children}</DashboardLayout>
                 </AuthProvider>

@@ -91,14 +91,14 @@ const AuthSection = () => {
     };
 
     return (
-        <section id="auth" className="py-[120px] px-6">
-            <div className="max-w-[1240px] mx-auto flex flex-col items-center">
+        <section id="auth" className="py-12 px-6">
+            <div className="max-w-[1200px] mx-auto flex flex-col items-center">
                 {/* Header */}
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-[#F5F7FF] mb-6 tracking-tight">
+                <div className="text-center mb-10">
+                    <h2 className="text-[#F5F7FF] mb-4 tracking-tight">
                         Start Trading in Minutes
                     </h2>
-                    <p className="max-w-[600px] mx-auto text-[#9FB0C7] text-lg leading-relaxed">
+                    <p className="max-w-[600px] mx-auto text-[#9FB0C7] text-[15px] leading-relaxed">
                         Access automated trading, live community insights, and verified performance.
                     </p>
                 </div>
@@ -109,7 +109,7 @@ const AuthSection = () => {
                     <div className="flex border-b border-white/5 bg-white/[0.02]">
                         <button
                             onClick={() => { setActiveTab("signin"); setError(null); }}
-                            className={`flex-1 py-6 text-[10px] font-black tracking-[0.2em] uppercase transition-all relative ${activeTab === "signin" ? "text-white" : "text-[#9FB0C7]/40 hover:text-[#9FB0C7]"
+                            className={`flex-1 py-4 text-[9px] font-black tracking-[0.2em] uppercase transition-all relative ${activeTab === "signin" ? "text-white" : "text-[#9FB0C7]/40 hover:text-[#9FB0C7]"
                                 }`}
                         >
                             SIGN IN
@@ -119,7 +119,7 @@ const AuthSection = () => {
                         </button>
                         <button
                             onClick={() => { setActiveTab("signup"); setError(null); }}
-                            className={`flex-1 py-6 text-[10px] font-black tracking-[0.2em] uppercase transition-all relative ${activeTab === "signup" ? "text-white" : "text-[#9FB0C7]/40 hover:text-[#9FB0C7]"
+                            className={`flex-1 py-4 text-[9px] font-black tracking-[0.2em] uppercase transition-all relative ${activeTab === "signup" ? "text-white" : "text-[#9FB0C7]/40 hover:text-[#9FB0C7]"
                                 }`}
                         >
                             CREATE ACCOUNT
@@ -129,56 +129,56 @@ const AuthSection = () => {
                         </button>
                     </div>
 
-                    <div className="p-10">
+                    <div className="p-8">
                         {error && (
-                            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-xs font-bold text-center animate-in fade-in slide-in-from-top-2">
+                            <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[11px] font-bold text-center animate-in fade-in slide-in-from-top-2">
                                 {error}
                             </div>
                         )}
 
                         {activeTab === "signin" ? (
                             <form onSubmit={handleLogin} className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
+                                <div className="space-y-1.5">
+                                    <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
                                         Email Address
                                     </label>
                                     <div className="relative group">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={18} />
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="email"
                                             type="email"
                                             required
                                             placeholder="name@company.com"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-sm focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-4 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
+                                <div className="space-y-1.5">
                                     <div className="flex justify-between items-center ml-1">
-                                        <label className="text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
+                                        <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
                                             Password
                                         </label>
-                                        <Link href="/forgot-password" title="bold" className="text-[10px] font-bold text-primary tracking-widest uppercase hover:underline">
+                                        <Link href="/forgot-password" title="bold" className="text-[9px] font-bold text-primary tracking-widest uppercase hover:underline">
                                             Forgot Password?
                                         </Link>
                                     </div>
                                     <div className="relative group">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={18} />
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="password"
                                             type={showPassword ? "text" : "password"}
                                             required
                                             minLength={6}
                                             placeholder="••••••••"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white text-sm focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-11 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
                                             className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 hover:text-white"
                                         >
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
                                     </div>
                                 </div>
@@ -186,14 +186,14 @@ const AuthSection = () => {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="btn-primary w-full py-5 flex items-center justify-center space-x-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="btn-primary w-full h-11 flex items-center justify-center space-x-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isLoading ? (
-                                        <Loader2 size={18} className="animate-spin" />
+                                        <Loader2 size={16} className="animate-spin" />
                                     ) : (
                                         <>
-                                            <span className="text-xs font-black tracking-[0.2em]">SIGN IN</span>
-                                            <ArrowRight size={18} />
+                                            <span className="text-[11px] font-black tracking-[0.2em]">SIGN IN</span>
+                                            <ArrowRight size={16} />
                                         </>
                                     )}
                                 </button>
@@ -216,18 +216,18 @@ const AuthSection = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
+                                <div className="space-y-1.5">
+                                    <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
                                         Email Address
                                     </label>
                                     <div className="relative group">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={18} />
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="email"
                                             type="email"
                                             required
                                             placeholder="name@company.com"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-sm focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-4 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
                                         />
                                     </div>
                                 </div>

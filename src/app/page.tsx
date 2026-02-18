@@ -12,7 +12,7 @@ import AuthSection from "@/components/sections/AuthSection";
 
 export default function Home() {
     return (
-        <main className="min-h-screen bg-[#050A12] pt-[100px]">
+        <main className="min-h-screen bg-[#050A12] pt-[60px]">
             <Header />
             <TickerTape />
             <Hero />
