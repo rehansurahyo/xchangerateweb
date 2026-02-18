@@ -200,18 +200,18 @@ const AuthSection = () => {
                             </form>
                         ) : (
                             <form onSubmit={handleRegister} className="space-y-6 animate-in fade-in slide-in-from-left-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
+                                <div className="space-y-1.5">
+                                    <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
                                         Full Name
                                     </label>
                                     <div className="relative group">
-                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={18} />
+                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="fullName"
                                             type="text"
                                             required
                                             placeholder="Enter your name"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-sm focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-4 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
                                         />
                                     </div>
                                 </div>
@@ -232,26 +232,26 @@ const AuthSection = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
+                                <div className="space-y-1.5">
+                                    <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
                                         Password
                                     </label>
                                     <div className="relative group">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={18} />
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="password"
                                             type={showPassword ? "text" : "password"}
                                             required
                                             minLength={6}
                                             placeholder="Minimum 8 characters"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white text-sm focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-11 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
                                             className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 hover:text-white"
                                         >
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
                                     </div>
                                 </div>
@@ -259,14 +259,14 @@ const AuthSection = () => {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="btn-primary w-full py-5 flex items-center justify-center space-x-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="btn-primary w-full h-11 flex items-center justify-center space-x-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isLoading ? (
-                                        <Loader2 size={18} className="animate-spin" />
+                                        <Loader2 size={16} className="animate-spin" />
                                     ) : (
                                         <>
-                                            <span className="text-xs font-black tracking-[0.2em]">CREATE ACCOUNT</span>
-                                            <ArrowRight size={18} />
+                                            <span className="text-[11px] font-black tracking-[0.2em]">CREATE ACCOUNT</span>
+                                            <ArrowRight size={16} />
                                         </>
                                     )}
                                 </button>
