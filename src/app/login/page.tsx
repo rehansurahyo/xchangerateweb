@@ -79,7 +79,7 @@ export default function LoginPage() {
                     )}
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black tracking-[0.15em] text-[#9FB0C7] uppercase ml-1">
+                        <label className="text-[10px] font-black tracking-[0.15em] text-slate-500 dark:text-[#9FB0C7] uppercase ml-1">
                             Email
                         </label>
                         <input
@@ -88,13 +88,13 @@ export default function LoginPage() {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                             placeholder="name@company.com"
-                            className="w-full bg-[#0D141F] border border-white/5 rounded-xl py-4 px-5 text-white text-sm focus:outline-none focus:border-primary/50 transition-all placeholder:text-[#9FB0C7]/20"
+                            className="w-full bg-slate-50 dark:bg-[#0D141F] border border-slate-200 dark:border-white/5 rounded-xl py-4 px-5 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-[#9FB0C7]/20"
                         />
                     </div>
 
                     <div className="space-y-2">
                         <div className="flex justify-between items-center ml-1">
-                            <label className="text-[10px] font-black tracking-[0.15em] text-[#9FB0C7] uppercase">
+                            <label className="text-[10px] font-black tracking-[0.15em] text-slate-500 dark:text-[#9FB0C7] uppercase">
                                 Password
                             </label>
                         </div>
@@ -105,12 +105,12 @@ export default function LoginPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 placeholder="Enter password"
-                                className="w-full bg-[#0D141F] border border-white/5 rounded-xl py-4 px-5 pr-12 text-white text-sm focus:outline-none focus:border-primary/50 transition-all placeholder:text-[#9FB0C7]/20"
+                                className="w-full bg-slate-50 dark:bg-[#0D141F] border border-slate-200 dark:border-white/5 rounded-xl py-4 px-5 pr-12 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-[#9FB0C7]/20"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 hover:text-white transition-colors"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9FB0C7]/40 hover:text-slate-900 dark:hover:text-white transition-colors"
                             >
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
@@ -143,9 +143,9 @@ export default function LoginPage() {
             </div>
 
             {/* Footer Text */}
-            <div className="mt-10 flex items-center space-x-2 text-[9px] font-medium text-[#9FB0C7]/30 tracking-tight">
+            <div className="mt-10 flex items-center space-x-2 text-[9px] font-medium text-slate-400 dark:text-[#9FB0C7]/30 tracking-tight">
                 <span>Secured connection</span>
-                <span className="w-1 h-1 rounded-full bg-[#9FB0C7]/20" />
+                <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-[#9FB0C7]/20" />
                 <span>256-bit encryption</span>
             </div>
         </div>

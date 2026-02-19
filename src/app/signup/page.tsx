@@ -65,7 +65,7 @@ export default function SignupPage() {
         <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
             {/* Back Button */}
             <div className="absolute top-8 left-1/2 -translate-x-1/2 max-w-[360px] w-full px-6">
-                <Link href="/" className="flex items-center space-x-1.5 text-[#9FB0C7] hover:text-white transition-colors text-[9px] font-bold tracking-widest uppercase">
+                <Link href="/" className="flex items-center space-x-1.5 text-slate-500 dark:text-[#9FB0C7] hover:text-slate-900 dark:hover:text-white transition-colors text-[9px] font-bold tracking-widest uppercase">
                     <ArrowLeft size={12} />
                     <span>Back</span>
                 </Link>
@@ -81,8 +81,8 @@ export default function SignupPage() {
                         className="object-contain"
                     />
                 </div>
-                <h1 className="text-lg font-black text-white tracking-widest uppercase">Create Account</h1>
-                <p className="text-[9px] text-[#9FB0C7]/60 font-bold tracking-widest uppercase mt-0.5">Join Arizona High</p>
+                <h1 className="text-lg font-black text-slate-900 dark:text-white tracking-widest uppercase">Create Account</h1>
+                <p className="text-[9px] text-slate-500 dark:text-[#9FB0C7]/60 font-bold tracking-widest uppercase mt-0.5">Join Arizona High</p>
             </div>
 
             {/* Signup Card */}
@@ -104,12 +104,12 @@ export default function SignupPage() {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                             placeholder="name@company.com"
-                            className="w-full bg-[#0D141F] border border-white/5 rounded-xl h-10 px-4 text-white text-[13px] focus:outline-none focus:border-primary/50 transition-all placeholder:text-[#9FB0C7]/20"
+                            className="w-full bg-slate-50 dark:bg-[#0D141F] border border-slate-200 dark:border-white/5 rounded-xl h-10 px-4 text-slate-900 dark:text-white text-[13px] focus:outline-none focus:border-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-[#9FB0C7]/20"
                         />
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-[9px] font-black tracking-[0.15em] text-[#9FB0C7] uppercase ml-1">
+                        <label className="text-[9px] font-black tracking-[0.15em] text-slate-500 dark:text-[#9FB0C7] uppercase ml-1">
                             Username
                         </label>
                         <input
@@ -118,12 +118,12 @@ export default function SignupPage() {
                             onChange={(e) => setUsername(e.target.value)}
                             required
                             placeholder="Choose a username"
-                            className="w-full bg-[#0D141F] border border-white/5 rounded-xl h-10 px-4 text-white text-[13px] focus:outline-none focus:border-primary/50 transition-all placeholder:text-[#9FB0C7]/20"
+                            className="w-full bg-slate-50 dark:bg-[#0D141F] border border-slate-200 dark:border-white/5 rounded-xl h-10 px-4 text-slate-900 dark:text-white text-[13px] focus:outline-none focus:border-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-[#9FB0C7]/20"
                         />
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-[9px] font-black tracking-[0.15em] text-[#9FB0C7] uppercase ml-1">
+                        <label className="text-[9px] font-black tracking-[0.15em] text-slate-500 dark:text-[#9FB0C7] uppercase ml-1">
                             Password
                         </label>
                         <div className="relative group">
@@ -133,7 +133,7 @@ export default function SignupPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 placeholder="Create a password"
-                                className="w-full bg-[#0D141F] border border-white/5 rounded-xl h-10 px-4 pr-11 text-white text-[13px] focus:outline-none focus:border-primary/50 transition-all placeholder:text-[#9FB0C7]/20"
+                                className="w-full bg-slate-50 dark:bg-[#0D141F] border border-slate-200 dark:border-white/5 rounded-xl h-10 px-4 pr-11 text-slate-900 dark:text-white text-[13px] focus:outline-none focus:border-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-[#9FB0C7]/20"
                             />
                             <button
                                 type="button"
@@ -146,7 +146,7 @@ export default function SignupPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-[9px] font-black tracking-[0.15em] text-[#9FB0C7] uppercase ml-1">
+                        <label className="text-[9px] font-black tracking-[0.15em] text-slate-500 dark:text-[#9FB0C7] uppercase ml-1">
                             Confirm Password
                         </label>
                         <div className="relative group">
@@ -156,7 +156,7 @@ export default function SignupPage() {
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 placeholder="Confirm your password"
-                                className="w-full bg-[#0D141F] border border-white/5 rounded-xl h-10 px-4 pr-11 text-white text-[13px] focus:outline-none focus:border-primary/50 transition-all placeholder:text-[#9FB0C7]/20"
+                                className="w-full bg-slate-50 dark:bg-[#0D141F] border border-slate-200 dark:border-white/5 rounded-xl h-10 px-4 pr-11 text-slate-900 dark:text-white text-[13px] focus:outline-none focus:border-primary/50 transition-all placeholder:text-slate-400 dark:placeholder:text-[#9FB0C7]/20"
                             />
                             <button
                                 type="button"
