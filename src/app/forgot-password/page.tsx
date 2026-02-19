@@ -18,7 +18,7 @@ export default function ForgotPassword() {
     }, []);
 
     if (!mounted) {
-        return <div className="min-h-screen bg-[#050A12]" />;
+        return <div className="min-h-screen bg-background" />;
     }
 
     const handleReset = async (e: React.FormEvent) => {
@@ -50,18 +50,18 @@ export default function ForgotPassword() {
     };
 
     return (
-        <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative overflow-hidden bg-[#050A12]">
+        <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative overflow-hidden bg-white dark:bg-[#050A12]">
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] animate-pulse-slow" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse-slow delay-1000" />
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] animate-pulse-slow dark:opacity-100 opacity-50" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse-slow delay-1000 dark:opacity-100 opacity-50" />
             </div>
 
             {/* Back Button */}
             <div className="absolute top-8 left-8">
                 <Link
                     href="/#auth"
-                    className="flex items-center space-x-2 text-[#9FB0C7] hover:text-white transition-colors group"
+                    className="flex items-center space-x-2 text-slate-500 hover:text-slate-900 dark:text-[#9FB0C7] dark:hover:text-white transition-colors group"
                 >
                     <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
                     <span className="text-sm font-bold tracking-wide">Back</span>
@@ -69,7 +69,7 @@ export default function ForgotPassword() {
             </div>
 
             {/* Main Card */}
-            <div className="glass-card w-full max-w-[500px] p-10 duration-500">
+            <div className="glass-card w-full max-w-[500px] p-10 duration-500 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
                 <div className="flex flex-col items-center text-center space-y-6 mb-8">
                     {/* Logo Section */}
                     <div className="w-32 h-8 relative flex items-center justify-center mb-2">
@@ -82,28 +82,28 @@ export default function ForgotPassword() {
                         />
                     </div>
 
-                    <h1 className="text-3xl font-extrabold text-white tracking-tight">
+                    <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                         Reset Password
                     </h1>
-                    <p className="text-[#9FB0C7] text-sm max-w-[300px]">
+                    <p className="text-slate-500 dark:text-[#9FB0C7] text-sm max-w-[300px]">
                         Enter your email to receive a reset link
                     </p>
                 </div>
 
                 <form onSubmit={handleReset} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
+                        <label className="text-[10px] font-bold tracking-[0.2em] text-slate-500 dark:text-[#9FB0C7] uppercase ml-1">
                             Email Address
                         </label>
                         <div className="relative group">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={18} />
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={18} />
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 placeholder="name@company.com"
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-sm focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                className="w-full bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-4 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                             />
                         </div>
                     </div>
@@ -133,7 +133,7 @@ export default function ForgotPassword() {
                 <div className="mt-8 text-center">
                     <Link
                         href="/#auth"
-                        className="text-xs font-bold text-[#9FB0C7] hover:text-white transition-colors tracking-wide"
+                        className="text-xs font-bold text-slate-400 hover:text-slate-900 dark:text-[#9FB0C7] dark:hover:text-white transition-colors tracking-wide"
                     >
                         Return to Sign In
                     </Link>

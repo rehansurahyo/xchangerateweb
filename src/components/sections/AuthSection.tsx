@@ -91,25 +91,25 @@ const AuthSection = () => {
     };
 
     return (
-        <section id="auth" className="py-12 px-6">
+        <section id="auth" className="py-12 px-6 bg-white text-slate-900 dark:bg-[#070B14] dark:text-slate-100">
             <div className="max-w-[1200px] mx-auto flex flex-col items-center">
                 {/* Header */}
                 <div className="text-center mb-10">
-                    <h2 className="text-[#F5F7FF] mb-4 tracking-tight">
+                    <h2 className="text-slate-900 dark:text-[#F5F7FF] mb-4 tracking-tight">
                         Start Trading in Minutes
                     </h2>
-                    <p className="max-w-[600px] mx-auto text-[#9FB0C7] text-[15px] leading-relaxed">
+                    <p className="max-w-[600px] mx-auto text-slate-500 dark:text-[#9FB0C7] text-[15px] leading-relaxed">
                         Access automated trading, live community insights, and verified performance.
                     </p>
                 </div>
 
                 {/* Auth Card */}
-                <div className="glass-card w-full max-w-[500px] overflow-hidden">
+                <div className="glass-card w-full max-w-[500px] overflow-hidden bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5">
                     {/* Tabs */}
-                    <div className="flex border-b border-white/5 bg-white/[0.02]">
+                    <div className="flex border-b border-white/5 bg-slate-50 dark:bg-white/[0.02]">
                         <button
                             onClick={() => { setActiveTab("signin"); setError(null); }}
-                            className={`flex-1 py-4 text-[9px] font-black tracking-[0.2em] uppercase transition-all relative ${activeTab === "signin" ? "text-white" : "text-[#9FB0C7]/40 hover:text-[#9FB0C7]"
+                            className={`flex-1 py-4 text-[9px] font-black tracking-[0.2em] uppercase transition-all relative ${activeTab === "signin" ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-[#9FB0C7]/40 hover:text-slate-600 dark:hover:text-[#9FB0C7]"
                                 }`}
                         >
                             SIGN IN
@@ -119,7 +119,7 @@ const AuthSection = () => {
                         </button>
                         <button
                             onClick={() => { setActiveTab("signup"); setError(null); }}
-                            className={`flex-1 py-4 text-[9px] font-black tracking-[0.2em] uppercase transition-all relative ${activeTab === "signup" ? "text-white" : "text-[#9FB0C7]/40 hover:text-[#9FB0C7]"
+                            className={`flex-1 py-4 text-[9px] font-black tracking-[0.2em] uppercase transition-all relative ${activeTab === "signup" ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-[#9FB0C7]/40 hover:text-slate-600 dark:hover:text-[#9FB0C7]"
                                 }`}
                         >
                             CREATE ACCOUNT
@@ -139,24 +139,24 @@ const AuthSection = () => {
                         {activeTab === "signin" ? (
                             <form onSubmit={handleLogin} className="space-y-6 animate-in fade-in slide-in-from-right-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
+                                    <label className="text-[9px] font-bold tracking-[0.2em] text-slate-500 dark:text-[#9FB0C7] uppercase ml-1">
                                         Email Address
                                     </label>
                                     <div className="relative group">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="email"
                                             type="email"
                                             required
                                             placeholder="name@company.com"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-4 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl h-11 pl-11 pr-4 text-slate-900 dark:text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <div className="flex justify-between items-center ml-1">
-                                        <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase">
+                                        <label className="text-[9px] font-bold tracking-[0.2em] text-slate-500 dark:text-[#9FB0C7] uppercase">
                                             Password
                                         </label>
                                         <Link href="/forgot-password" title="bold" className="text-[9px] font-bold text-primary tracking-widest uppercase hover:underline">
@@ -164,19 +164,19 @@ const AuthSection = () => {
                                         </Link>
                                     </div>
                                     <div className="relative group">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="password"
                                             type={showPassword ? "text" : "password"}
                                             required
                                             minLength={6}
                                             placeholder="••••••••"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-11 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl h-11 pl-11 pr-11 text-slate-900 dark:text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 hover:text-white"
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9FB0C7]/40 hover:text-slate-900 dark:hover:text-white"
                                         >
                                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
@@ -201,55 +201,55 @@ const AuthSection = () => {
                         ) : (
                             <form onSubmit={handleRegister} className="space-y-6 animate-in fade-in slide-in-from-left-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
+                                    <label className="text-[9px] font-bold tracking-[0.2em] text-slate-500 dark:text-[#9FB0C7] uppercase ml-1">
                                         Full Name
                                     </label>
                                     <div className="relative group">
-                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
+                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="fullName"
                                             type="text"
                                             required
                                             placeholder="Enter your name"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-4 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl h-11 pl-11 pr-4 text-slate-900 dark:text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
+                                    <label className="text-[9px] font-bold tracking-[0.2em] text-slate-500 dark:text-[#9FB0C7] uppercase ml-1">
                                         Email Address
                                     </label>
                                     <div className="relative group">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="email"
                                             type="email"
                                             required
                                             placeholder="name@company.com"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-4 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl h-11 pl-11 pr-4 text-slate-900 dark:text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[9px] font-bold tracking-[0.2em] text-[#9FB0C7] uppercase ml-1">
+                                    <label className="text-[9px] font-bold tracking-[0.2em] text-slate-500 dark:text-[#9FB0C7] uppercase ml-1">
                                         Password
                                     </label>
                                     <div className="relative group">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9FB0C7]/40 group-focus-within:text-primary transition-colors" size={16} />
                                         <input
                                             name="password"
                                             type={showPassword ? "text" : "password"}
                                             required
                                             minLength={6}
                                             placeholder="Minimum 8 characters"
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl h-11 pl-11 pr-11 text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                                            className="w-full bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl h-11 pl-11 pr-11 text-slate-900 dark:text-white text-[13px] focus:outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9FB0C7]/40 hover:text-white"
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9FB0C7]/40 hover:text-slate-900 dark:hover:text-white"
                                         >
                                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>

@@ -7,30 +7,28 @@ interface ExchangeTabsProps {
 
 const ExchangeTabs = ({ activeExchange, onExchangeChange }: ExchangeTabsProps) => {
     const exchanges = [
-        { id: 'Binance' as const, color: 'text-yellow-400', badge: 1 },
-        { id: 'Bybit' as const, color: 'text-orange-500', badge: 1 },
-        { id: 'OKX' as const, color: 'text-blue-400', badge: 0 },
+        { id: 'Binance' as const, badge: 1, hasDot: true },
+        { id: 'Bybit' as const, badge: 1, hasDot: true },
+        { id: 'OKX' as const, badge: 1, hasDot: false },
     ];
 
     return (
-        <div className="flex p-1 rounded-xl bg-[#0A101A] border border-white/5 w-full md:w-auto">
+        <div className="flex w-full border-b border-slate-200 dark:border-white/[0.03]">
             {exchanges.map((ex) => (
                 <button
                     key={ex.id}
                     onClick={() => onExchangeChange(ex.id)}
-                    className={`px-6 py-2 text-[9px] font-black tracking-[0.2em] uppercase transition-all flex-1 md:flex-none flex items-center justify-center space-x-2 rounded-lg relative overflow-hidden ${activeExchange === ex.id
-                        ? `bg-white/[0.03] text-white shadow-inner`
-                        : "text-[#9FB0C7]/40 hover:text-[#9FB0C7]"
+                    className={`flex-1 relative py-3 text-[11px] font-bold tracking-widest uppercase transition-all flex items-center justify-center space-x-3 
+                        ${activeExchange === ex.id
+                            ? "bg-yellow-500/10 dark:bg-[#EAB308]/10 text-yellow-600 dark:text-[#EAB308] border-b-2 border-yellow-500 dark:border-[#EAB308]"
+                            : "text-slate-400 dark:text-[#9FB0C7]/40 hover:text-slate-600 dark:hover:text-[#9FB0C7]/60 border-b-2 border-transparent hover:bg-slate-50 dark:hover:bg-white/[0.02]"
                         }`}
                 >
-                    {activeExchange === ex.id && (
-                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-2.5 rounded-r-full ${ex.id === 'Binance' ? 'bg-yellow-400' :
-                            ex.id === 'Bybit' ? 'bg-orange-500' :
-                                'bg-blue-400'
-                            }`} />
+                    {ex.hasDot && (
+                        <div className={`w-1.5 h-1.5 rounded-full ${activeExchange === ex.id ? 'bg-yellow-500 dark:bg-[#EAB308]' : 'bg-slate-300 dark:bg-[#9FB0C7]/20'}`} />
                     )}
                     <span>{ex.id}</span>
-                    <span className={`px-1 py-0.5 rounded text-[7px] font-bold bg-white/5 ${activeExchange === ex.id ? ex.color : 'text-[#9FB0C7]/40'}`}>
+                    <span className={`px-1 rounded text-[10px] font-bold ${activeExchange === ex.id ? 'bg-yellow-500/20 dark:bg-[#EAB308]/20 text-yellow-600 dark:text-[#EAB308]' : 'bg-slate-100 dark:bg-white/[0.03] text-slate-400 dark:text-[#9FB0C7]/20'}`}>
                         {ex.badge}
                     </span>
                 </button>

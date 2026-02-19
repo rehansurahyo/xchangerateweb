@@ -34,38 +34,38 @@ export default function BillingPage() {
     return (
         <div className="space-y-12 animate-in fade-in duration-500">
             <div className="text-center space-y-4">
-                <h2 className="text-4xl font-black text-white uppercase tracking-tight">Choice Your Plan</h2>
-                <p className="text-xs font-bold text-[#9FB0C7]/40 uppercase tracking-[0.3em]">Scalable institutional trading for everyone</p>
+                <h2 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Choose Your Plan</h2>
+                <p className="text-xs font-bold text-slate-500 dark:text-[#9FB0C7]/40 uppercase tracking-[0.3em]">Scalable institutional trading for everyone</p>
             </div>
 
             {/* Current Active Plan Block */}
-            <div className="glass-card p-10 bg-primary/[0.02] border-primary/20 relative overflow-hidden">
+            <div className="glass-card p-10 bg-slate-50 dark:bg-[#0A101A] border border-slate-200 dark:border-white/5 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-6">
-                    <Crown size={60} className="text-primary/10" />
+                    <Crown size={60} className="text-slate-200 dark:text-primary/10" />
                 </div>
                 <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
                     <div className="space-y-4 text-center md:text-left">
                         <div>
                             <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] bg-primary/10 px-3 py-1 rounded-full">Active Plan</span>
-                            <h3 className="text-3xl font-black text-white uppercase tracking-tight mt-3">Professional Suite</h3>
+                            <h3 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight mt-3">Professional Suite</h3>
                         </div>
                         <div className="flex items-center justify-center md:justify-start space-x-6">
                             <div>
-                                <p className="text-[10px] font-black text-[#9FB0C7]/40 uppercase tracking-widest mb-1">Price</p>
-                                <p className="text-xl font-bold text-white">$79<span className="text-sm font-medium opacity-40">/mo</span></p>
+                                <p className="text-[10px] font-black text-slate-400 dark:text-[#9FB0C7]/40 uppercase tracking-widest mb-1">Price</p>
+                                <p className="text-xl font-bold text-slate-900 dark:text-white">$79<span className="text-sm font-medium opacity-40">/mo</span></p>
                             </div>
-                            <div className="w-px h-8 bg-white/10" />
+                            <div className="w-px h-8 bg-slate-200 dark:bg-white/10" />
                             <div>
-                                <p className="text-[10px] font-black text-[#9FB0C7]/40 uppercase tracking-widest mb-1">Status</p>
-                                <p className="text-xl font-bold text-[#22D3A6]">RECURRING</p>
+                                <p className="text-[10px] font-black text-slate-400 dark:text-[#9FB0C7]/40 uppercase tracking-widest mb-1">Status</p>
+                                <p className="text-xl font-bold text-emerald-500 dark:text-[#22D3A6]">RECURRING</p>
                             </div>
                         </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <button className="px-8 py-4 rounded-2xl bg-white/[0.03] border border-white/5 text-[10px] font-black text-white uppercase tracking-widest hover:bg-white/[0.05] transition-all">
+                        <button className="px-8 py-4 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-white/[0.05] transition-all shadow-sm dark:shadow-none">
                             Update Billing
                         </button>
-                        <button className="px-8 py-4 rounded-2xl bg-red-400/10 border border-red-400/20 text-[10px] font-black text-red-400 uppercase tracking-widest hover:bg-red-400/20 transition-all">
+                        <button className="px-8 py-4 rounded-2xl bg-red-500/10 dark:bg-red-400/10 border border-red-500/20 dark:border-red-400/20 text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest hover:bg-red-500/20 dark:hover:bg-red-400/20 transition-all">
                             Cancel Subscription
                         </button>
                     </div>
@@ -76,7 +76,7 @@ export default function BillingPage() {
                 {plans.map((plan) => (
                     <div
                         key={plan.name}
-                        className={`glass-card p-10 flex flex-col space-y-8 relative overflow-hidden transition-all duration-500 hover:scale-[1.02] ${activePlan === plan.name ? 'border-primary/40 bg-primary/[0.03] shadow-[0_0_40px_rgba(47,128,255,0.1)]' : 'border-white/5'
+                        className={`glass-card p-10 flex flex-col space-y-8 relative overflow-hidden transition-all duration-500 hover:scale-[1.02] ${activePlan === plan.name ? 'border-primary/40 bg-primary/[0.03] shadow-[0_0_40px_rgba(47,128,255,0.1)]' : 'border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.03]'
                             }`}
                     >
                         {plan.isPopular && (
@@ -86,22 +86,22 @@ export default function BillingPage() {
                         )}
 
                         <div className="space-y-4">
-                            <div className={`w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center ${plan.color}`}>
+                            <div className={`w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 flex items-center justify-center ${plan.color}`}>
                                 <plan.icon size={28} />
                             </div>
                             <div>
-                                <h4 className="text-2xl font-black text-white uppercase tracking-tight">{plan.name}</h4>
+                                <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{plan.name}</h4>
                                 <div className="flex items-baseline space-x-1">
-                                    <span className="text-3xl font-black text-white">${plan.price}</span>
-                                    <span className="text-xs font-bold text-[#9FB0C7]/40 uppercase tracking-widest">/ Month</span>
+                                    <span className="text-3xl font-black text-slate-900 dark:text-white">${plan.price}</span>
+                                    <span className="text-xs font-bold text-slate-500 dark:text-[#9FB0C7]/40 uppercase tracking-widest">/ Month</span>
                                 </div>
                             </div>
                         </div>
 
                         <ul className="flex-1 space-y-4">
                             {plan.features.map(f => (
-                                <li key={f} className="flex items-center space-x-3 text-xs font-medium text-[#9FB0C7]">
-                                    <Check size={16} className={`shrink-0 ${activePlan === plan.name ? 'text-primary' : 'text-[#9FB0C7]/20'}`} />
+                                <li key={f} className="flex items-center space-x-3 text-xs font-medium text-slate-600 dark:text-[#9FB0C7]">
+                                    <Check size={16} className={`shrink-0 ${activePlan === plan.name ? 'text-primary' : 'text-slate-300 dark:text-[#9FB0C7]/20'}`} />
                                     <span>{f}</span>
                                 </li>
                             ))}
@@ -110,8 +110,8 @@ export default function BillingPage() {
                         <button
                             onClick={() => setActivePlan(plan.name)}
                             className={`w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activePlan === plan.name
-                                    ? 'bg-primary text-white shadow-[0_0_20px_rgba(47,128,255,0.4)] cursor-default'
-                                    : 'bg-white/[0.03] border border-white/5 text-[#9FB0C7] hover:text-white hover:bg-white/[0.05]'
+                                ? 'bg-primary text-white shadow-[0_0_20px_rgba(47,128,255,0.4)] cursor-default'
+                                : 'bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 text-slate-500 dark:text-[#9FB0C7] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05]'
                                 }`}
                         >
                             {activePlan === plan.name ? 'CURRENT PLAN' : 'SELECT PLAN'}

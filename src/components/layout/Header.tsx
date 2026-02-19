@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Menu, X, Flame } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -21,13 +22,13 @@ const Header = () => {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled ? "bg-[#050A12]/90 backdrop-blur-md border-white/5 h-[60px]" : "bg-[#050A12] border-white/5 h-[60px]"
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled ? "bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-slate-200 dark:border-white/5 h-[60px]" : "bg-white dark:bg-slate-950 border-slate-200 dark:border-white/5 h-[60px]"
                 }`}
         >
             <div className="max-w-[1200px] mx-auto h-full px-6 flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center group">
-                    <div className="relative w-24 h-[26px] group-hover:scale-105 transition-transform duration-300">
+                    <div className="relative w-32 h-9 group-hover:scale-105 transition-transform duration-300">
                         <Image
                             src="/assets/logo.png"
                             alt="Arizona High Logo"
@@ -44,7 +45,7 @@ const Header = () => {
                         <Link
                             key={item}
                             href={`#${item.toLowerCase().replace(/ /g, "-")}`}
-                            className="text-[12px] font-medium tracking-tight text-[#9FB0C7] hover:text-white transition-colors"
+                            className="text-[12px] font-medium tracking-tight text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                         >
                             {item}
                         </Link>
@@ -52,8 +53,9 @@ const Header = () => {
                 </nav>
 
                 {/* Auth Buttons */}
-                <div className="hidden md:flex items-center space-x-5">
-                    <Link href="/login" className="text-[12px] font-medium text-[#9FB0C7] hover:text-white transition-colors">
+                <div className="hidden md:flex items-center space-x-4">
+                    <ThemeToggle />
+                    <Link href="/login" className="text-[12px] font-medium text-slate-500 dark:text-[#9FB0C7] hover:text-slate-900 dark:hover:text-white transition-colors">
                         SIGN IN
                     </Link>
                     <Link href="/signup" className="btn-primary flex items-center h-9 px-4 !rounded-lg text-[12px]">
@@ -63,7 +65,7 @@ const Header = () => {
 
                 {/* Mobile Toggle */}
                 <button
-                    className="md:hidden text-white"
+                    className="md:hidden text-slate-900 dark:text-white"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
                     {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -72,19 +74,19 @@ const Header = () => {
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-                <div className="md:hidden absolute top-full left-0 right-0 bg-[#050A12] border-b border-white/10 py-6 px-6 space-y-4 animate-in fade-in slide-in-from-top-4 shadow-2xl">
+                <div className="md:hidden absolute top-full left-0 right-0 bg-white dark:bg-[#050A12] border-b border-slate-200 dark:border-white/10 py-6 px-6 space-y-4 animate-in fade-in slide-in-from-top-4 shadow-xl">
                     {navItems.map((item) => (
                         <Link
                             key={item}
                             href={`#${item.toLowerCase().replace(/ /g, "-")}`}
-                            className="block text-xs font-bold tracking-widest text-[#9FB0C7] hover:text-white py-2"
+                            className="block text-xs font-bold tracking-widest text-slate-500 dark:text-[#9FB0C7] hover:text-slate-900 dark:hover:text-white py-2"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
                             {item}
                         </Link>
                     ))}
-                    <div className="pt-6 border-t border-white/5 flex flex-col space-y-4">
-                        <Link href="/login" className="text-left text-xs font-bold tracking-widest text-white" onClick={() => setIsMobileMenuOpen(false)}>
+                    <div className="pt-6 border-t border-slate-200 dark:border-white/5 flex flex-col space-y-4">
+                        <Link href="/login" className="text-left text-xs font-bold tracking-widest text-slate-900 dark:text-white" onClick={() => setIsMobileMenuOpen(false)}>
                             SIGN IN
                         </Link>
                         <Link href="/signup" className="bg-[#2F80FF] py-3 rounded-lg text-white text-xs font-black tracking-widest uppercase text-center" onClick={() => setIsMobileMenuOpen(false)}>

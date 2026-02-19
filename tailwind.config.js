@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+    darkMode: 'class',
     content: [
         "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,18 +10,25 @@ module.exports = {
         extend: {
             colors: {
                 background: {
-                    start: "#050A12",
-                    end: "#070E18",
+                    start: "var(--background-start)",
+                    end: "var(--background-end)",
                 },
-                surface: "rgba(16, 24, 39, 0.6)",
-                border: "rgba(255, 255, 255, 0.06)",
-                primary: "#2F80FF",
+                surface: "var(--surface)",
+                border: "var(--border)",
+                primary: "var(--primary)",
+
+                // Design System Aliases
+                bg: "var(--bg)",
+                card: "var(--card)",
+                text: "var(--text)",
+                muted: "var(--muted)",
+
                 accent: {
                     blue: "#2F80FF",
                     teal: "#22D3A6",
                 },
-                heading: "#F5F7FF",
-                body: "#9FB0C7",
+                heading: "var(--heading)",
+                body: "var(--body)",
             },
             borderRadius: {
                 'card': '24px',

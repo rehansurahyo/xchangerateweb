@@ -10,8 +10,8 @@ const LiveCommunity = () => {
             time: "10:31",
             message: "BTC/USDT closed +3.2% — AI caught the 42k dip perfectly. Target achieved.",
             type: "TRADES",
-            color: "text-[#22D3A6]",
-            bg: "bg-[#22D3A6]/10",
+            color: "text-accent-teal",
+            bg: "bg-accent-teal/10",
         },
         {
             initials: "AI",
@@ -37,8 +37,8 @@ const LiveCommunity = () => {
             message: "Entered at 42,150 market — bot filled instantly. Session target 5% triggered exit.",
             type: "WIN",
             tag: "WIN",
-            color: "text-[#22D3A6]",
-            bg: "bg-[#22D3A6]/10",
+            color: "text-accent-teal",
+            bg: "bg-accent-teal/10",
         },
         {
             initials: "SY",
@@ -47,13 +47,13 @@ const LiveCommunity = () => {
             message: "Platform update: New risk management v2.4 deployed. Auto-stop improved by 18%.",
             type: "UPDATE",
             tag: "UPDATE",
-            color: "text-[#FFB800]",
-            bg: "bg-[#FFB800]/10",
+            color: "text-amber-500 dark:text-amber-400",
+            bg: "bg-amber-500/10 dark:bg-amber-400/10",
         },
     ];
 
     return (
-        <section id="community" className="py-12 px-6 text-center">
+        <section id="community" className="py-12 px-6 text-center bg-white text-slate-900 dark:bg-[#070B14] dark:text-slate-100">
             <div className="max-w-[1200px] mx-auto">
                 {/* Section Header */}
                 <div className="flex flex-col items-center mb-8">
@@ -63,51 +63,51 @@ const LiveCommunity = () => {
                             LIVE TRADING FLOOR
                         </span>
                     </div>
-                    <h2 className="text-[#F5F7FF] mb-4">
+                    <h2 className="text-slate-900 dark:text-white mb-4 text-3xl font-black tracking-tight">
                         Live Community
                     </h2>
-                    <p className="max-w-[700px] text-[#9FB0C7] text-[15px] leading-relaxed">
+                    <p className="max-w-[700px] text-slate-600 dark:text-slate-300 text-[15px] leading-relaxed">
                         Real-time trade wins, AI signal alerts, system updates, and strategy discussions from active traders worldwide.
                     </p>
                 </div>
 
                 {/* Community Panel */}
-                <div className="glass-card max-w-[900px] mx-auto overflow-hidden text-left relative">
+                <div className="glass-card max-w-[900px] mx-auto overflow-hidden text-left relative bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10">
                     {/* Header/Tabs */}
-                    <div className="bg-white/5 border-b border-white/5 px-6 py-4 flex items-center justify-between flex-wrap gap-4">
+                    <div className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200 dark:border-white/5 px-6 py-4 flex items-center justify-between flex-wrap gap-4">
                         <div className="flex items-center space-x-6">
-                            <span className="text-sm font-bold text-white tracking-widest uppercase">
+                            <span className="text-sm font-bold text-slate-900 dark:text-white tracking-widest uppercase">
                                 Trading Floor
                             </span>
-                            <span className="text-xs font-semibold text-[#9FB0C7] tracking-widest uppercase opacity-50">
+                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-widest uppercase opacity-70">
                                 Global
                             </span>
                         </div>
 
                         <div className="flex items-center space-x-4">
                             <div className="flex items-center space-x-2">
-                                <span className="w-1.5 h-1.5 bg-[#22D3A6] rounded-full" />
-                                <span className="text-[10px] font-bold tracking-widest text-[#22D3A6] uppercase">
+                                <span className="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full" />
+                                <span className="text-[10px] font-bold tracking-widest text-emerald-600 dark:text-emerald-400 uppercase">
                                     TRADES
                                 </span>
                             </div>
                             <div className="flex items-center space-x-2 opacity-60">
-                                <span className="w-1.5 h-1.5 bg-primary rounded-full" />
-                                <span className="text-[10px] font-bold tracking-widest text-primary uppercase">
+                                <span className="w-1.5 h-1.5 bg-blue-500 dark:bg-blue-400 rounded-full" />
+                                <span className="text-[10px] font-bold tracking-widest text-blue-600 dark:text-blue-400 uppercase">
                                     SIGNALS
                                 </span>
                             </div>
                             <div className="flex items-center space-x-2 opacity-60">
-                                <span className="w-1.5 h-1.5 bg-[#FFB800] rounded-full" />
-                                <span className="text-[10px] font-bold tracking-widest text-[#FFB800] uppercase">
+                                <span className="w-1.5 h-1.5 bg-amber-500 dark:bg-amber-400 rounded-full" />
+                                <span className="text-[10px] font-bold tracking-widest text-amber-600 dark:text-amber-400 uppercase">
                                     SYSTEM
                                 </span>
                             </div>
                         </div>
 
                         <div className="flex items-center space-x-2">
-                            <span className="w-1.5 h-1.5 bg-[#22D3A6] rounded-full animate-pulse" />
-                            <span className="text-[11px] font-bold text-[#22D3A6]">248 online</span>
+                            <span className="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full animate-pulse" />
+                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">248 online</span>
                         </div>
                     </div>
 
@@ -115,14 +115,14 @@ const LiveCommunity = () => {
                     <div className="p-6 space-y-8 max-h-[500px] overflow-y-auto custom-scrollbar">
                         {chatMessages.map((msg, idx) => (
                             <div key={idx} className="flex space-x-4 group">
-                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/30 transition-colors">
-                                    <span className="text-xs font-bold text-[#9FB0C7] group-hover:text-white">
+                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-white/5 flex items-center justify-center border border-slate-200 dark:border-white/10 group-hover:border-primary/30 transition-colors">
+                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">
                                         {msg.initials}
                                     </span>
                                 </div>
                                 <div className="flex-1 space-y-1">
                                     <div className="flex items-center space-x-2">
-                                        <span className="text-sm font-bold text-white tracking-tight">
+                                        <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
                                             {msg.name}
                                         </span>
                                         {msg.tag && (
@@ -130,11 +130,11 @@ const LiveCommunity = () => {
                                                 {msg.tag}
                                             </span>
                                         )}
-                                        <span className="text-[10px] font-medium text-[#9FB0C7]/50">
+                                        <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
                                             {msg.time}
                                         </span>
                                     </div>
-                                    <p className="text-sm text-[#9FB0C7] leading-relaxed">
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                                         {msg.message}
                                     </p>
                                 </div>
@@ -143,14 +143,14 @@ const LiveCommunity = () => {
                     </div>
 
                     {/* Login Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-[#050A12] via-[#050A12]/90 to-transparent flex items-end justify-center pb-10">
+                    <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#050914] dark:via-[#050914]/90 flex items-end justify-center pb-10">
                         <div className="flex flex-col items-center space-y-4">
-                            <span className="text-sm font-bold text-white/50 tracking-widest uppercase">
+                            <span className="text-sm font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">
                                 Login to participate in live trading discussions
                             </span>
-                            <button className="glass-card py-3 px-8 flex items-center space-x-3 border-white/20 hover:border-primary transition-all">
-                                <Lock size={16} className="text-[#9FB0C7]" />
-                                <span className="text-xs font-bold tracking-widest text-white uppercase">
+                            <button className="glass-card py-3 px-8 flex items-center space-x-3 border-slate-200 dark:border-white/10 hover:border-primary/50 transition-all bg-white dark:bg-white/5 shadow-sm">
+                                <Lock size={16} className="text-slate-400 dark:text-slate-400" />
+                                <span className="text-xs font-bold tracking-widest text-slate-900 dark:text-white uppercase">
                                     LOGIN TO JOIN
                                 </span>
                             </button>

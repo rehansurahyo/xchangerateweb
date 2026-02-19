@@ -11,7 +11,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     if (isAuthPage) return <>{children}</>;
 
     return (
-        <div className="min-h-screen bg-[#050A12]">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#050A12]">
             <TopNav />
             <main className="pt-24 pb-12 px-4 md:px-8 max-w-[1440px] mx-auto">
                 {children}

@@ -48,10 +48,10 @@ export default function LoginPage() {
         }
     };
 
-    if (!mounted) return <div className="min-h-screen bg-[#050A12]" />;
+    if (!mounted) return <div className="min-h-screen bg-background" />;
 
     return (
-        <div className="min-h-screen w-full bg-[#050A12] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
             {/* Background Decor */}
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />

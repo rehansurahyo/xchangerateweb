@@ -5,7 +5,7 @@ import HowItWorks from "@/components/sections/HowItWorks";
 
 export default function HowItWorksPage() {
     return (
-        <main className="min-h-screen bg-[#050A12]">
+        <main className="min-h-screen bg-background">
             <Header />
             <div className="pt-[80px]">
                 <TickerTape />

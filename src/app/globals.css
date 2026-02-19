@@ -3,6 +3,25 @@
 @tailwind utilities;
 
 :root {
+    /* Light Mode (Default) */
+    --background-start: #FFFFFF;
+    --background-end: #F8FAFC;
+    --surface: #FFFFFF;
+    --border: #E2E8F0;
+    --primary: #2F80FF;
+    --heading: #0F172A;
+    --body: #64748B;
+
+    /* Design System Aliases (User Requested) */
+    --bg: #F8FAFC;
+    --card: #FFFFFF;
+    --text: #0F172A;
+    --muted: #64748B;
+}
+
+[data-theme='dark'],
+.dark {
+    /* Dark Mode (Preserved Original) */
     --background-start: #060B1A;
     --background-end: #0A1229;
     --surface: rgba(11, 22, 45, 0.7);
@@ -10,6 +29,12 @@
     --primary: #2F80FF;
     --heading: #F5F7FF;
     --body: #9FB0C7;
+
+    /* Design System Aliases (User Requested) */
+    --bg: #050A12;
+    --card: rgba(11, 22, 45, 0.7);
+    --text: #F5F7FF;
+    --muted: #9FB0C7;
 }
 
 body {

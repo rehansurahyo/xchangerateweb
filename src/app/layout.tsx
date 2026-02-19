@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import AuthProvider from "@/components/providers/AuthProvider";
+import ThemeProvider from "@/components/providers/ThemeProvider";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -23,7 +24,14 @@ export default function RootLayout({
         <html lang="en" className="dark">
             <body className={plusJakartaSans.className}>
                 <AuthProvider>
-                    <DashboardLayout>{children}</DashboardLayout>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <DashboardLayout>{children}</DashboardLayout>
+                    </ThemeProvider>
                 </AuthProvider>
             </body>
         </html>

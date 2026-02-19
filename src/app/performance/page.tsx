@@ -5,7 +5,7 @@ import LiveRankings from "@/components/sections/LiveRankings";
 
 export default function PerformancePage() {
     return (
-        <main className="min-h-screen bg-[#050A12]">
+        <main className="min-h-screen bg-background">
             <Header />
             <div className="pt-[80px]">
                 <TickerTape />

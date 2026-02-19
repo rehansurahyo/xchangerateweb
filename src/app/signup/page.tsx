@@ -59,10 +59,10 @@ export default function SignupPage() {
         }
     };
 
-    if (!mounted) return <div className="min-h-screen bg-[#050A12]" />;
+    if (!mounted) return <div className="min-h-screen bg-background" />;
 
     return (
-        <div className="min-h-screen w-full bg-[#050A12] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
             {/* Back Button */}
             <div className="absolute top-8 left-1/2 -translate-x-1/2 max-w-[360px] w-full px-6">
                 <Link href="/" className="flex items-center space-x-1.5 text-[#9FB0C7] hover:text-white transition-colors text-[9px] font-bold tracking-widest uppercase">

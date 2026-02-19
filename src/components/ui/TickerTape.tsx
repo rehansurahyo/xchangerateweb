@@ -16,18 +16,18 @@ const TickerTape = () => {
   const displayItems = [...items, ...items, ...items, ...items];
 
   return (
-    <div className="w-full bg-[#050A12] border-b border-white/5 py-1 overflow-hidden group relative z-40">
+    <div className="w-full bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-white/5 py-1 overflow-hidden group relative z-40">
       <div className="flex animate-marquee hover:pause-animation whitespace-nowrap">
         {displayItems.map((item, idx) => (
           <div
             key={idx}
-            className="flex items-center space-x-2 px-4 border-r border-white/5 last:border-0"
+            className="flex items-center space-x-2 px-4 border-r border-slate-200 dark:border-white/5 last:border-0"
           >
-            <span className="text-[12px] font-bold text-[#9FB0C7] tracking-tight whitespace-nowrap">
+            <span className="text-[12px] font-bold text-muted tracking-tight whitespace-nowrap">
               {item.pair}
             </span>
             <span
-              className={`text-[12px] font-bold ${item.positive ? "text-[#22D3A6]" : "text-red-500"
+              className={`text-[12px] font-bold ${item.positive ? "text-emerald-500 dark:text-accent-teal" : "text-red-500"
                 }`}
             >
               {item.change}
