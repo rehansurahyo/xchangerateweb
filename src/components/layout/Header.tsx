@@ -52,24 +52,28 @@ const Header = () => {
                     ))}
                 </nav>
 
-                {/* Auth Buttons */}
-                <div className="hidden md:flex items-center space-x-4">
+                {/* Auth & Actions */}
+                <div className="flex items-center space-x-3 md:space-x-4">
                     <ThemeToggle />
-                    <Link href="/login" className="text-[12px] font-medium text-slate-500 dark:text-[#9FB0C7] hover:text-slate-900 dark:hover:text-white transition-colors">
-                        SIGN IN
-                    </Link>
-                    <Link href="/signup" className="btn-primary flex items-center h-9 px-4 !rounded-lg text-[12px]">
-                        GET STARTED
-                    </Link>
-                </div>
 
-                {/* Mobile Toggle */}
-                <button
-                    className="md:hidden text-slate-900 dark:text-white"
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                >
-                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
+                    {/* Desktop Auth Buttons */}
+                    <div className="hidden md:flex items-center space-x-4">
+                        <Link href="/login" className="text-[12px] font-medium text-slate-500 dark:text-[#9FB0C7] hover:text-slate-900 dark:hover:text-white transition-colors">
+                            SIGN IN
+                        </Link>
+                        <Link href="/signup" className="btn-primary flex items-center h-9 px-4 !rounded-lg text-[12px]">
+                            GET STARTED
+                        </Link>
+                    </div>
+
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        className="md:hidden text-slate-900 dark:text-white p-1"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    >
+                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
             </div>
 
             {/* Mobile Menu */}
