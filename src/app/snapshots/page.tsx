@@ -12,7 +12,7 @@ export default function SnapshotsPage() {
     const { supabase, user } = useAuth();
     const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isMounted, setIsMounted] = useState(false);
+    const [hasMounted, setHasMounted] = useState(false);
 
     const fetchLatestSnapshots = async () => {
         if (!user) return;
@@ -45,8 +45,8 @@ export default function SnapshotsPage() {
     };
 
     useEffect(() => {
+        setHasMounted(true);
         if (!user) return;
-
         fetchLatestSnapshots();
 
         const channel = supabase
@@ -63,7 +63,6 @@ export default function SnapshotsPage() {
             )
             .subscribe();
 
-        setIsMounted(true);
         return () => {
             supabase.removeChannel(channel);
         };
@@ -104,7 +103,7 @@ export default function SnapshotsPage() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <span className="text-[9px] font-black text-[#22D3A6] border border-[#22D3A6]/20 bg-[#22D3A6]/5 px-2 py-0.5 rounded uppercase tracking-widest">Live</span>
-                                    <span className="text-[9px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-widest leading-none ml-2">Last Update: {isMounted ? new Date(snapshot.created_at).toLocaleTimeString() : '--:--:--'}</span>
+                                    <span className="text-[9px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-widest leading-none ml-2">Last Update: {hasMounted ? new Date(snapshot.created_at).toLocaleTimeString() : '--:--:--'}</span>
                                 </div>
                             </div>
 

@@ -25,6 +25,36 @@ const SessionCard = ({ session, positions }: SessionCardProps) => {
     const displayPositions = snapshot?.positions || [];
     const totalExposure = displayPositions.reduce((acc: number, p: any) => acc + (Math.abs(num(p.positionAmt)) * num(p.entryPrice)), 0);
 
+    const [isLoadingToggle, setIsLoadingToggle] = useState(false);
+
+    const handleToggleStatus = async () => {
+        setIsLoadingToggle(true);
+        try {
+            const nextStatus = isRunning ? 'Inactive' : 'Active';
+            const res = await fetch(`/api/sessions/${session.id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: nextStatus })
+            });
+            if (!res.ok) throw new Error('Failed to toggle status');
+            // UI will update via Supabase Realtime if subscribed, or via parent refresh
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsLoadingToggle(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!confirm('Are you sure you want to delete this session?')) return;
+        try {
+            const res = await fetch(`/api/sessions/${session.id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Failed to delete session');
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <div className="glass-card hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-all overflow-hidden border border-slate-200 dark:border-white/5 bg-white dark:bg-[#0A101A] shadow-sm dark:shadow-none">
             {/* Header */}
@@ -39,20 +69,11 @@ const SessionCard = ({ session, positions }: SessionCardProps) => {
                     </div>
                 </div>
                 <div className="flex items-center space-x-4">
-                    <div className="flex flex-col items-end">
-                        <div className="flex items-center space-x-2.5">
-                            <span className="text-[11px] font-mono text-slate-900 dark:text-[#9FB0C7]/60">
-                                {session.last_sync_at ? new Date(session.last_sync_at).toLocaleTimeString() : 'Never'}
-                            </span>
-                            <span className={`text-[11px] font-black ${isRunning ? 'text-emerald-500 dark:text-[#22D3A6]' : 'text-slate-900 dark:text-white/40'} uppercase tracking-widest`}>
-                                {isRunning ? 'LIVE' : 'OFFLINE'}
-                            </span>
-                        </div>
-                        {session.last_error && (
-                            <span className="text-[9px] font-bold text-red-500 truncate max-w-[120px]" title={session.last_error}>
-                                ⚠️ Error
-                            </span>
-                        )}
+                    <div className="flex items-center space-x-2.5">
+                        <span className="text-[11px] font-mono text-slate-900 dark:text-[#9FB0C7]/60">{session.uptime || '00d 00h 00m'}</span>
+                        <span className={`text-[11px] font-black ${isRunning ? 'text-emerald-500 dark:text-[#22D3A6]' : 'text-slate-900 dark:text-white/40'} uppercase tracking-widest`}>
+                            {isRunning ? 'LIVE' : 'OFFLINE'}
+                        </span>
                     </div>
                     {isExpanded ? <ChevronUp size={16} className="text-slate-900 dark:text-[#9FB0C7]/40" /> : <ChevronDown size={16} className="text-slate-900 dark:text-[#9FB0C7]/40" />}
                 </div>
@@ -63,19 +84,12 @@ const SessionCard = ({ session, positions }: SessionCardProps) => {
                     <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono text-slate-900 dark:text-[#9FB0C7]/20 uppercase tracking-[0.2em]">{session.api_key_masked}</span>
                         <div className="flex items-center space-x-2">
-                            <RefreshCcw size={10} className={isRunning && !session.last_error ? 'text-emerald-500 dark:text-[#22D3A6] animate-spin-slow' : 'text-slate-900 dark:text-[#9FB0C7]/40'} />
-                            <span className={`text-[9px] font-black ${isRunning ? (session.last_error ? 'text-red-500' : 'text-emerald-600 dark:text-[#22D3A6]') : 'text-slate-900'} uppercase tracking-widest leading-none`}>
-                                {isRunning ? (session.last_error ? 'AR ERROR' : 'AR RUNNING') : 'AR STOPPED'}
+                            <RefreshCcw size={10} className={isRunning ? 'text-emerald-500 dark:text-[#22D3A6] animate-spin-slow' : 'text-slate-900 dark:text-[#9FB0C7]/40'} />
+                            <span className={`text-[9px] font-black ${isRunning ? 'text-emerald-600 dark:text-[#22D3A6]' : 'text-slate-900'} uppercase tracking-widest leading-none`}>
+                                {isRunning ? 'AR RUNNING' : 'AR STOPPED'}
                             </span>
                         </div>
                     </div>
-                    {session.last_error && (
-                        <div className="p-2 bg-red-500/5 border border-red-500/10 rounded-md">
-                            <p className="text-[10px] text-red-500 font-bold leading-tight">
-                                {session.last_error}
-                            </p>
-                        </div>
-                    )}
 
                     <div className="flex items-center justify-between border-y border-slate-100 dark:border-white/[0.03] py-2.5">
                         <h4 className="text-[11px] font-black text-slate-900 dark:text-[#9FB0C7]/40 uppercase tracking-[0.2em]">Balance Sheet</h4>
@@ -158,13 +172,20 @@ const SessionCard = ({ session, positions }: SessionCardProps) => {
             {/* Footer Actions */}
             <div className="grid grid-cols-4 divide-x divide-slate-100 dark:divide-white/5 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#050A12]">
                 <button
-                    className={`py-2 flex items-center justify-center text-[9px] font-black tracking-widest uppercase transition-all hover:bg-slate-200 dark:hover:bg-white/5 ${isRunning ? 'text-red-500' : 'text-emerald-600'}`}
+                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(); }}
+                    disabled={isLoadingToggle}
+                    className={`py-2 flex items-center justify-center text-[9px] font-black tracking-widest uppercase transition-all hover:bg-slate-200 dark:hover:bg-white/5 ${isRunning ? 'text-red-500' : 'text-emerald-600'} disabled:opacity-50`}
                 >
-                    {isRunning ? 'STOP' : 'START'}
+                    {isLoadingToggle ? '...' : (isRunning ? 'STOP' : 'START')}
                 </button>
                 <button className="py-2 text-slate-950 dark:text-[#9FB0C7] hover:bg-slate-200 dark:hover:bg-white/5 text-[9px] font-black tracking-widest uppercase transition-all">IPS</button>
                 <button className="py-2 text-slate-950 dark:text-[#9FB0C7] hover:bg-slate-200 dark:hover:bg-white/5 text-[9px] font-black tracking-widest uppercase transition-all">CLOSE</button>
-                <button className="py-2 text-red-900/40 hover:text-red-400 hover:bg-red-400/5 text-[9px] font-black tracking-widest uppercase transition-all">DEL</button>
+                <button
+                    onClick={(e) => { e.stopPropagation(); handleDelete(); }}
+                    className="py-2 text-red-900/40 hover:text-red-400 hover:bg-red-400/5 text-[9px] font-black tracking-widest uppercase transition-all"
+                >
+                    DEL
+                </button>
             </div>
         </div>
     );

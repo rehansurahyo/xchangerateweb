@@ -53,8 +53,6 @@ export interface Database {
                     proxies: Json
                     target_percent: number
                     status: 'Active' | 'Inactive'
-                    last_error: string | null
-                    last_sync_at: string | null
                     created_at: string
                 }
                 Insert: {
@@ -68,23 +66,6 @@ export interface Database {
                     proxies?: Json
                     target_percent?: number
                     status?: 'Active' | 'Inactive'
-                    last_error?: string | null
-                    last_sync_at?: string | null
-                    created_at?: string
-                }
-                Update: {
-                    id?: string
-                    user_id?: string
-                    name?: string
-                    exchange?: string
-                    api_key_masked?: string
-                    encrypted_api_key?: string
-                    encrypted_api_secret?: string
-                    proxies?: Json
-                    target_percent?: number
-                    status?: 'Active' | 'Inactive'
-                    last_error?: string | null
-                    last_sync_at?: string | null
                     created_at?: string
                 }
             }
@@ -107,9 +88,6 @@ export interface Database {
                     user_id: string
                     plan: 'Starter' | 'Pro' | 'Elite' | null
                     status: string | null
-                    stripe_customer_id: string | null
-                    stripe_subscription_id: string | null
-                    current_period_end: string | null
                 }
             }
             community_messages: {
@@ -140,18 +118,6 @@ export interface Database {
                     created_at?: string
                 }
             }
-        }
-        Views: {
-            [_ in never]: never
-        }
-        Functions: {
-            [_ in never]: never
-        }
-        Enums: {
-            [_ in never]: never
-        }
-        CompositeTypes: {
-            [_ in never]: never
         }
     }
 }

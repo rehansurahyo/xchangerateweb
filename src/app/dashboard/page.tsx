@@ -14,8 +14,8 @@ export default function DashboardPage() {
     const [positions, setPositions] = useState<any[]>([]);
     const [balances, setBalances] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-    const [isMounted, setIsMounted] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+    const [hasMounted, setHasMounted] = useState(false);
 
     const fetchDashboardData = async () => {
         if (!user) return;
@@ -71,6 +71,7 @@ export default function DashboardPage() {
     };
 
     useEffect(() => {
+        setHasMounted(true);
         if (!user) return;
 
         fetchDashboardData();
@@ -95,7 +96,6 @@ export default function DashboardPage() {
             })
             .subscribe();
 
-        setIsMounted(true);
         return () => {
             supabase.removeChannel(channel);
         };
@@ -133,7 +133,7 @@ export default function DashboardPage() {
                     <div className="flex items-center space-x-2 mt-1">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         <span className="text-[10px] font-bold text-[#9FB0C7]/40 uppercase tracking-widest">
-                            Live Stream Active • Last sync: {isMounted && lastUpdated ? lastUpdated.toLocaleTimeString() : '--:--:--'}
+                            Live Stream Active • Last sync: {hasMounted ? lastUpdated.toLocaleTimeString() : '--:--:--'}
                         </span>
                     </div>
                 </div>
