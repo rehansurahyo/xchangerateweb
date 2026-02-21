@@ -21,7 +21,7 @@ const ExchangeTabs = ({ activeExchange, onExchangeChange }: ExchangeTabsProps) =
                     className={`flex-1 relative py-3 text-[11px] font-bold tracking-widest uppercase transition-all flex items-center justify-center space-x-3 
                         ${activeExchange === ex.id
                             ? "bg-yellow-500/10 dark:bg-[#EAB308]/10 text-yellow-600 dark:text-[#EAB308] border-b-2 border-yellow-500 dark:border-[#EAB308]"
-                            : "text-slate-400 dark:text-[#9FB0C7]/40 hover:text-slate-600 dark:hover:text-[#9FB0C7]/60 border-b-2 border-transparent hover:bg-slate-50 dark:hover:bg-white/[0.02]"
+                            : "text-slate-900 dark:text-[#9FB0C7]/40 hover:text-slate-600 dark:hover:text-[#9FB0C7]/60 border-b-2 border-transparent hover:bg-slate-50 dark:hover:bg-white/[0.02]"
                         }`}
                 >
                     {ex.hasDot && (

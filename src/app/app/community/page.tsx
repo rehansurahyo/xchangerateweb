@@ -81,8 +81,8 @@ export default function CommunityPage() {
                             key={ch}
                             onClick={() => setActiveChannel(ch as any)}
                             className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${activeChannel === ch
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                                : 'text-slate-950 dark:text-[#9FB0C7] hover:text-black dark:hover:text-white'
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                                 }`}
                         >
                             #{ch}
@@ -119,7 +119,7 @@ export default function CommunityPage() {
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             placeholder={`Message #${activeChannel}...`}
-                            className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg py-3 pl-4 pr-12 text-[11px] text-slate-950 dark:text-white"
+                            className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg py-3 pl-4 pr-12 text-[11px]"
                         />
                         <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded">
                             <Send size={14} />

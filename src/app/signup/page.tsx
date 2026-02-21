@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/providers/AuthProvider";
 import Image from "next/image";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function SignupPage() {
     const router = useRouter();
+    const { supabase } = useAuth();
     const [mounted, setMounted] = useState(false);
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
@@ -34,23 +36,26 @@ export default function SignupPage() {
         }
 
         try {
-            const res = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fullName: username, email, password }),
+            const { data, error: signUpError } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: username,
+                    },
+                },
             });
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || "Registration failed");
+            if (signUpError) {
+                throw new Error(signUpError.message);
             }
 
-            if (data.message) {
-                // Handle email confirmation if needed, but for now redirect to login
-                router.push("/login?message=" + encodeURIComponent(data.message));
-            } else {
+            if (data.user && !data.session) {
+                setError("Account created! Please check your email and click the confirmation link before logging in.");
+                setTimeout(() => router.push("/login"), 5000);
+            } else if (data.session) {
                 router.push("/dashboard");
+                router.refresh();
             }
         } catch (err: any) {
             setError(err.message);

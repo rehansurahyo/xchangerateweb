@@ -1,7 +1,7 @@
-"use client";
+"use client"; // Updated for Supabase Auth migration
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
     LayoutDashboard,
@@ -13,25 +13,28 @@ import {
     CreditCard,
     ShieldCheck,
     LogOut,
-    ChevronDown
+    ChevronDown,
+    Activity
 } from "lucide-react";
 import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { MOCK_USER } from "@/lib/mock";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const TopNav = () => {
     const pathname = usePathname();
-    const { data: session } = useSession();
+    const router = useRouter();
+    const { user, supabase } = useAuth();
     const [showUserMenu, setShowUserMenu] = useState(false);
 
-    const userEmail = session?.user?.email || MOCK_USER.email;
-    const userName = session?.user?.name || MOCK_USER.username;
-    const userInitials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || MOCK_USER.initials;
+    const userEmail = user?.email || MOCK_USER.email;
+    const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || MOCK_USER.username;
+    const userInitials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || MOCK_USER.initials;
 
     const navItems = [
         { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-        { label: "API Config", href: "/api-config", icon: Settings2 },
+        { label: "Api Config", href: "/api-config", icon: Settings2 },
+        { label: "Live Status", href: "/snapshots", icon: Activity },
         { label: "Community", href: "/community", icon: Users2 },
         { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
     ];
@@ -67,7 +70,7 @@ const TopNav = () => {
                             href={item.href}
                             className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase transition-all flex items-center space-x-1.5 ${isActive
                                 ? "bg-blue-500/10 dark:bg-primary/10 text-blue-600 dark:text-primary shadow-[0_0_20px_rgba(47,128,255,0.1)]"
-                                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
+                                : "text-slate-950 dark:text-slate-400 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                                 }`}
                         >
                             <item.icon size={12} />
@@ -96,7 +99,7 @@ const TopNav = () => {
                                 </span>
                             </div>
                         </div>
-                        <ChevronDown size={12} className={`text-slate-400 dark:text-[#9FB0C7]/40 group-hover:text-slate-900 dark:group-hover:text-white transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+                        <ChevronDown size={12} className={`text-slate-950 dark:text-[#9FB0C7]/40 group-hover:text-black dark:group-hover:text-white transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
                     </button>
 
                     {/* Dropdown Menu */}
@@ -108,8 +111,8 @@ const TopNav = () => {
                             />
                             <div className="absolute top-full right-0 mt-3 w-56 bg-white dark:bg-[#0B1222] p-2 border border-slate-200 dark:border-primary/20 shadow-2xl animate-in fade-in zoom-in-95 duration-200 rounded-xl overflow-hidden backdrop-blur-xl">
                                 <div className="p-3 border-b border-slate-100 dark:border-white/5 mb-2">
-                                    <p className="text-[9px] font-black text-slate-400 dark:text-[#9FB0C7]/40 uppercase tracking-widest mb-1">Signed in as</p>
-                                    <p className="text-[11px] font-bold text-slate-900 dark:text-white truncate">{userEmail}</p>
+                                    <p className="text-[9px] font-black text-slate-950 dark:text-[#9FB0C7]/40 uppercase tracking-widest mb-1">Signed in as</p>
+                                    <p className="text-[11px] font-bold text-slate-950 dark:text-white truncate">{userEmail}</p>
                                 </div>
 
                                 <div className="space-y-1">
@@ -118,9 +121,9 @@ const TopNav = () => {
                                             key={item.href}
                                             href={item.href}
                                             onClick={() => setShowUserMenu(false)}
-                                            className="flex items-center space-x-3 px-3 py-2 rounded-lg text-[10px] font-bold text-slate-500 dark:text-[#9FB0C7] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all group"
+                                            className="flex items-center space-x-3 px-3 py-2 rounded-lg text-[10px] font-bold text-slate-950 dark:text-[#9FB0C7] hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all group"
                                         >
-                                            <item.icon size={14} className="text-slate-400 dark:text-[#9FB0C7]/40 group-hover:text-blue-500 dark:group-hover:text-primary transition-colors" />
+                                            <item.icon size={14} className="text-slate-950 dark:text-[#9FB0C7]/40 group-hover:text-blue-500 dark:group-hover:text-primary transition-colors" />
                                             <span>{item.label}</span>
                                         </Link>
                                     ))}
@@ -128,7 +131,11 @@ const TopNav = () => {
 
                                 <div className="mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
                                     <button
-                                        onClick={() => signOut({ callbackUrl: "/" })}
+                                        onClick={async () => {
+                                            await supabase.auth.signOut();
+                                            router.push("/");
+                                            router.refresh();
+                                        }}
                                         className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-[10px] font-bold text-red-500/80 dark:text-red-400/80 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-400/5 transition-all group"
                                     >
                                         <LogOut size={14} className="text-red-400/40 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors" />

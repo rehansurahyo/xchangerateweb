@@ -31,7 +31,7 @@ export default function LeaderboardPage() {
     }, [supabase]);
 
     return (
-        <div className="max-w-[1000px] mx-auto space-y-4 animate-in fade-in duration-500 pt-24 px-6">
+        <div className="max-w-[1000px] mx-auto space-y-4 animate-in fade-in duration-500 pt-20 px-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-none uppercase">LeaderBoard</h2>
@@ -55,28 +55,24 @@ export default function LeaderboardPage() {
                 ))}
             </div>
 
-            <div className="space-y-4 pb-12">
-                {stats.length > 0 ? stats.map((item) => (
+            <div className="space-y-4">
+                {stats.map((item) => (
                     <div key={item.id} className="glass-card p-3 border border-slate-200 dark:border-white/5 bg-white dark:bg-[#0A101A] flex items-center justify-between">
                         <div className="flex items-center space-x-6">
-                            <div className="w-6 text-center font-black text-xs text-slate-950">#{item.rank}</div>
+                            <div className="w-6 text-center font-black text-xs text-slate-400">#{item.rank}</div>
                             <div className="flex items-center space-x-3">
                                 <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
                                     <User size={16} className="text-blue-600" />
                                 </div>
-                                <h4 className="text-xs font-black text-slate-950 dark:text-white uppercase">{item.username || 'Trader'}</h4>
+                                <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase">{item.username || 'Trader'}</h4>
                             </div>
                         </div>
                         <div className="text-right">
                             <p className="text-xs font-black text-emerald-500">+{item.roi}%</p>
-                            <p className="text-[9px] font-bold text-slate-950 dark:text-slate-400 uppercase tracking-widest">${item.profit?.toLocaleString()}</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase">${item.profit?.toLocaleString()}</p>
                         </div>
                     </div>
-                )) : (
-                    <div className="text-center py-20 text-slate-400 dark:text-white/10 text-[10px] uppercase tracking-widest font-black">
-                        No leaderboard data yet
-                    </div>
-                )}
+                ))}
             </div>
         </div>
     );

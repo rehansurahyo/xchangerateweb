@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useAuth } from "@/components/providers/AuthProvider";
 import Link from "next/link";
 import { Eye, EyeOff, ArrowRight, User, Mail, Lock, Loader2 } from "lucide-react";
 
 const AuthSection = () => {
     const router = useRouter();
+    const { supabase } = useAuth();
     const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -24,20 +25,16 @@ const AuthSection = () => {
         const password = formData.get("password") as string;
 
         try {
-            const res = await signIn("credentials", {
+            const { error: signInError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
-                redirect: false,
             });
 
-            if (res?.error) {
-                if (res.error.includes("Email not confirmed")) {
-                    setError("Email not confirmed. Please check your inbox or spam folder.");
-                } else {
-                    setError(res.error);
-                }
+            if (signInError) {
+                setError(signInError.message);
             } else {
                 router.push("/dashboard");
+                router.refresh();
             }
         } catch (err) {
             setError("Something went wrong. Please try again.");
@@ -58,31 +55,27 @@ const AuthSection = () => {
         const password = formData.get("password") as string;
 
         try {
-            const res = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fullName, email, password }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || "Registration failed");
-            }
-
-            if (data.message) {
-                setError(data.message);
-                setTimeout(() => setActiveTab("signin"), 3000);
-                return;
-            }
-
-            await signIn("credentials", {
+            const { data, error: signUpError } = await supabase.auth.signUp({
                 email,
                 password,
-                redirect: false,
+                options: {
+                    data: {
+                        full_name: fullName,
+                    },
+                },
             });
 
-            router.push("/dashboard");
+            if (signUpError) {
+                throw new Error(signUpError.message);
+            }
+
+            if (data.user && !data.session) {
+                setError("Account created! Please check your email and click the confirmation link before logging in.");
+                setTimeout(() => setActiveTab("signin"), 5000);
+            } else if (data.session) {
+                router.push("/dashboard");
+                router.refresh();
+            }
         } catch (err: any) {
             setError(err.message);
         } finally {

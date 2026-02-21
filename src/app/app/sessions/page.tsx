@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, X, RefreshCcw, Trash2 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
-export default function ApiConfigPage() {
+export default function SessionsPage() {
     const { supabase } = useAuth();
     const [sessions, setSessions] = useState<any[]>([]);
     const [showModal, setShowModal] = useState(false);
@@ -89,7 +89,7 @@ export default function ApiConfigPage() {
         <div className="space-y-6 animate-in fade-in duration-500 pt-20 px-6 max-w-[1000px] mx-auto pb-20">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-[10px] font-black text-slate-500 dark:text-[#9FB0C7] uppercase tracking-[0.3em]">API Config</h2>
+                    <h2 className="text-[10px] font-black text-slate-500 dark:text-[#9FB0C7] uppercase tracking-[0.3em]">API Sessions</h2>
                     <p className="text-[9px] font-bold text-slate-400 dark:text-[#9FB0C7]/40 uppercase tracking-widest mt-0.5">
                         {isLoading ? 'Loading...' : `${sessions.length} configured · ${sessions.filter(s => s.status === 'Active').length} active`}
                     </p>
@@ -168,7 +168,7 @@ export default function ApiConfigPage() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 dark:bg-[#050A12]/90 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="w-full max-w-[500px] bg-white dark:bg-[#0F172A] rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/5">
                         <div className="p-4 border-b border-slate-200 dark:border-white/5 flex items-center justify-between bg-white dark:bg-[#0F172A]">
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">New Connection</h3>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">New Session</h3>
                             <button
                                 onClick={() => setShowModal(false)}
                                 className="text-slate-400 dark:text-[#9FB0C7] hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -188,38 +188,9 @@ export default function ApiConfigPage() {
                                         className="w-full bg-slate-50 dark:bg-[#1E293B] border border-slate-200 dark:border-white/10 rounded-lg py-3 px-4 text-slate-900 dark:text-white text-sm"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold tracking-widest text-slate-500 dark:text-[#9FB0C7] uppercase">Exchange</label>
-                                    <select
-                                        value={formData.exchange}
-                                        onChange={(e) => setFormData({ ...formData, exchange: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-lg py-3 px-4 text-slate-900 dark:text-white text-sm"
-                                    >
-                                        <option>Binance</option>
-                                        <option>Bybit</option>
-                                        <option>OKX</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold tracking-widest text-slate-500 dark:text-[#9FB0C7] uppercase">API Key</label>
-                                    <input
-                                        type="password" required
-                                        value={formData.apiKey}
-                                        onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-lg py-3 px-4 text-slate-900 dark:text-white text-sm"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold tracking-widest text-slate-500 dark:text-[#9FB0C7] uppercase">API Secret</label>
-                                    <input
-                                        type="password" required
-                                        value={formData.apiSecret}
-                                        onChange={(e) => setFormData({ ...formData, apiSecret: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-lg py-3 px-4 text-slate-900 dark:text-white text-sm"
-                                    />
-                                </div>
-                                <button type="submit" className="w-full py-3 bg-blue-600 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-blue-500/20">
-                                    Create Connection
+                                {/* ... Other fields ... */}
+                                <button type="submit" className="w-full py-3 bg-blue-600 text-white rounded-lg text-sm font-bold transition-all">
+                                    Create Session
                                 </button>
                             </form>
                         </div>

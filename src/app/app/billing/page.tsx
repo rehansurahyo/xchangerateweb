@@ -55,7 +55,7 @@ export default function BillingPage() {
                         </div>
                         <ul className="flex-1 space-y-4">
                             {plan.features.map(f => (
-                                <li key={f} className="flex items-center space-x-3 text-[11px] font-bold text-slate-900 dark:text-[#9FB0C7]">
+                                <li key={f} className="flex items-center space-x-3 text-[11px] font-bold text-slate-600 dark:text-[#9FB0C7]">
                                     <Check size={14} className="text-blue-600" />
                                     <span>{f}</span>
                                 </li>

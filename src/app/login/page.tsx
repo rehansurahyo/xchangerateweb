@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useAuth } from "@/components/providers/AuthProvider";
 import Image from "next/image";
 import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 
 export default function LoginPage() {
     const router = useRouter();
+    const { supabase } = useAuth();
     const [mounted, setMounted] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -26,20 +27,16 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const res = await signIn("credentials", {
+            const { error: signInError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
-                redirect: false,
             });
 
-            if (res?.error) {
-                if (res.error.includes("Email not confirmed")) {
-                    setError("Email not confirmed. Please check your inbox or spam folder.");
-                } else {
-                    setError(res.error);
-                }
+            if (signInError) {
+                setError(signInError.message);
             } else {
                 router.push("/dashboard");
+                router.refresh();
             }
         } catch (err) {
             setError("An unexpected error occurred.");

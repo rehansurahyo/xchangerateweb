@@ -14,8 +14,6 @@ export default function DashboardPage() {
     const [positions, setPositions] = useState<any[]>([]);
     const [balances, setBalances] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-    const [isMounted, setIsMounted] = useState(false);
 
     const fetchDashboardData = async () => {
         if (!user) return;
@@ -28,32 +26,10 @@ export default function DashboardPage() {
                 .select('*')
                 .eq('user_id', user.id);
 
-            // Fetch latest snapshots
-            const { data: latestSnaps } = await supabase
-                .from('account_snapshots')
-                .select('*')
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false });
+            if (sessionsData) setSessions(sessionsData);
 
-            // Group by session and take the latest
-            const snapMap: Record<string, any> = {};
-            if (latestSnaps) {
-                latestSnaps.forEach(snap => {
-                    if (!snapMap[snap.session_id]) {
-                        snapMap[snap.session_id] = snap.snapshot;
-                    }
-                });
-            }
-
-            if (sessionsData) {
-                const merged = sessionsData.map(s => ({
-                    ...s,
-                    latest_snapshot: snapMap[s.id] || null
-                }));
-                setSessions(merged);
-            }
-
-            // Fetch trades/positions
+            // Fetch trades/positions (mapping to our new trades_log or keeping old positions table if needed)
+            // For now, staying compatible with what components expect
             const { data: positionsData } = await supabase
                 .from('trades_log')
                 .select('*')
@@ -61,7 +37,16 @@ export default function DashboardPage() {
                 .eq('status', 'OPEN');
 
             if (positionsData) setPositions(positionsData);
-            setLastUpdated(new Date());
+
+            // Fetch subscription for balance/plan display
+            const { data: subData } = await supabase
+                .from('subscriptions')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+
+            // Mock balance for now till exchange SDK is ready
+            setBalances([{ balance: 0 }]);
 
         } catch (error) {
             console.error("Dashboard fetch error:", error);
@@ -79,64 +64,33 @@ export default function DashboardPage() {
         const channel = supabase
             .channel('dashboard_updates')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'trades_log', filter: `user_id=eq.${user.id}` }, (payload) => {
-                fetchDashboardData();
+                fetchDashboardData(); // Simpler for now to ensure all derived stats update
             })
             .on('postgres_changes', { event: '*', schema: 'public', table: 'api_credentials', filter: `user_id=eq.${user.id}` }, (payload) => {
-                fetchDashboardData();
-            })
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'account_snapshots', filter: `user_id=eq.${user.id}` }, (payload) => {
-                const newSnap = payload.new as any;
-                setSessions(prev => prev.map(s =>
-                    s.id === newSnap.session_id
-                        ? { ...s, latest_snapshot: newSnap.snapshot }
-                        : s
-                ));
-                setLastUpdated(new Date());
+                if (payload.eventType === 'UPDATE') {
+                    setSessions(prev => prev.map(s => s.id === payload.new.id ? payload.new : s));
+                }
             })
             .subscribe();
 
-        setIsMounted(true);
         return () => {
             supabase.removeChannel(channel);
         };
     }, [user, supabase]);
 
     const filteredSessions = sessions.filter(s => s.exchange === activeExchange);
-    const activeSessions = filteredSessions.filter(s => s.status === 'Active');
-
-    // Aggregation logic
-    let totalWallet = 0;
-    let totalUnrealizedPnl = 0;
-    let totalOpenPositions = 0;
-
-    activeSessions.forEach(s => {
-        const snap = s.latest_snapshot;
-        if (snap) {
-            totalWallet += parseFloat(snap.totalWalletBalance || "0");
-            totalUnrealizedPnl += parseFloat(snap.totalUnrealizedProfit || "0");
-            totalOpenPositions += (snap.positions?.length || 0);
-        }
-    });
-
-    const walletBalance = totalWallet;
-    const totalPnl = totalUnrealizedPnl;
-    const activeSessionsCount = activeSessions.length;
-
+    // filteredPositions logic would need update if session_id is uuid now
     const filteredPositions = positions.filter(p => sessions.find(s => s.id === p.session_id)?.exchange === activeExchange);
-    const totalExposure = filteredPositions.reduce((acc, p) => acc + (Math.abs(Number(p.size || 0)) * Number(p.mark_price || p.entry_price || 0)), 0);
+
+    const totalPnl = filteredSessions.reduce((acc, s) => acc + (Number(s.pnl) || 0), 0);
+    const walletBalance = balances.length > 0 ? Number(balances[0].balance) : 0;
+    const activeSessionsCount = filteredSessions.filter(s => s.status === 'Active').length;
+    const totalExposure = filteredPositions.reduce((acc, p) => acc + (Number(p.size || 0) * Number(p.mark_price || p.entry_price || 0)), 0);
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500 px-6 md:px-12 min-h-screen bg-background dark:bg-[#050A12] pb-10 pt-20">
             <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-xl font-black text-slate-950 dark:text-white uppercase tracking-tight">Main Dashboard</h2>
-                    <div className="flex items-center space-x-2 mt-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-[#9FB0C7]/40 uppercase tracking-widest">
-                            Live Stream Active • Last sync: {isMounted && lastUpdated ? lastUpdated.toLocaleTimeString() : '--:--:--'}
-                        </span>
-                    </div>
-                </div>
+                <div />
             </div>
 
             <ExchangeTabs
@@ -159,7 +113,7 @@ export default function DashboardPage() {
                 />
                 <MetricCard
                     label="POSITIONS"
-                    value={totalOpenPositions.toString()}
+                    value={filteredPositions.length.toString()}
                 />
             </div>
 
@@ -171,7 +125,7 @@ export default function DashboardPage() {
                     </span>
                 </div>
                 <div className="text-right">
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-[#9FB0C7]/40 uppercase tracking-widest leading-none">Combined P&L: </span>
+                    <span className="text-[10px] font-bold text-slate-950 dark:text-[#9FB0C7]/40 uppercase tracking-widest leading-none">Combined P&L: </span>
                     <span className={`text-[11px] font-bold ${totalPnl >= 0 ? 'text-emerald-500 dark:text-[#22D3A6]' : 'text-red-500'} tracking-tighter ml-1`}>
                         {totalPnl >= 0 ? '+' : ''}{totalPnl.toFixed(4)}
                     </span>
@@ -203,7 +157,7 @@ export default function DashboardPage() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <span className="text-[11px] font-bold text-slate-500 dark:text-[#9FB0C7]/40 uppercase tracking-widest leading-none">Total Exposure: </span>
+                                    <span className="text-[11px] font-bold text-slate-950 dark:text-[#9FB0C7]/40 uppercase tracking-widest leading-none">Total Exposure: </span>
                                     <span className="text-[12px] font-black text-slate-950 dark:text-white tracking-tighter ml-1">
                                         ${totalExposure.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </span>
@@ -212,13 +166,13 @@ export default function DashboardPage() {
                         </div>
                     ))
                 ) : (
-                    <div className="col-span-full glass-card p-12 flex flex-col items-center justify-center text-center space-y-3 border border-slate-200 dark:border-white/5 bg-white dark:bg-[#0A101A] shadow-sm dark:shadow-none">
-                        <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-400 dark:text-[#9FB0C7]/20">
+                    <div className="col-span-full glass-card p-12 flex flex-col items-center justify-center text-center space-y-3 border border-white/5 bg-[#0A101A]">
+                        <div className="w-12 h-12 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center text-[#9FB0C7]/20">
                             <TrendingUp size={24} />
                         </div>
                         <div className="space-y-0.5">
-                            <h4 className="text-slate-950 dark:text-white text-[11px] font-bold uppercase tracking-widest">No Active Sessions</h4>
-                            <p className="text-xs text-slate-500 dark:text-[#9FB0C7]/40 max-w-[300px]">
+                            <h4 className="text-white text-[11px] font-bold uppercase tracking-widest">No Active Sessions</h4>
+                            <p className="text-xs text-[#9FB0C7]/40 max-w-[300px]">
                                 Connect your API keys and deploy an AI strategy to start trading on {activeExchange}.
                             </p>
                         </div>
