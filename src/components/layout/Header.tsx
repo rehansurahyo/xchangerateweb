@@ -34,6 +34,7 @@ const Header = () => {
                             alt="Arizona High Logo"
                             fill
                             className="object-contain"
+                            sizes="128px"
                             priority
                         />
                     </div>

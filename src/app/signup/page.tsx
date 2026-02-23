@@ -54,6 +54,9 @@ export default function SignupPage() {
                 setError("Account created! Please check your email and click the confirmation link before logging in.");
                 setTimeout(() => router.push("/login"), 5000);
             } else if (data.session) {
+                if (data.session.access_token) {
+                    localStorage.setItem('xcr_token', data.session.access_token);
+                }
                 router.push("/dashboard");
                 router.refresh();
             }

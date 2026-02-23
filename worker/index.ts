@@ -1,16 +1,6 @@
 /**
- * XChangeRate Futures Worker (Binance)
- * - Polls active api_credentials sessions from Supabase
- * - Decrypts API key/secret (CryptoJS AES)
- * - Fetches Binance Futures snapshot (account + positionRisk)
- * - Inserts into account_snapshots
- *
- * IMPORTANT:
- * - This worker ONLY updates columns that exist in your api_credentials schema.
- *   (Your schema does NOT include last_sync_at / last_error by default.)
- * - If you want those, add them via SQL:
- *   alter table public.api_credentials add column if not exists last_sync_at timestamptz;
- *   alter table public.api_credentials add column if not exists last_error text;
+ * XChangeRate Trading Worker (V2)
+ * Fully refactored for Production, Render, and Demo modes.
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -19,377 +9,381 @@ import * as dotenv from "dotenv";
 import path from "path";
 import axios, { AxiosError, AxiosInstance } from "axios";
 import * as crypto from "crypto";
+import * as http from "http";
 import { Database } from "../src/lib/types";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
-// -------------------- ENV --------------------
-function mustEnv(name: string): string {
-    const v = process.env[name];
-    if (!v || !v.trim()) {
-        console.error(`❌ Missing env: ${name}`);
-        process.exit(1);
-    }
-    return v.trim();
-}
-
-const SUPABASE_URL = mustEnv("NEXT_PUBLIC_SUPABASE_URL");
-const SUPABASE_SERVICE_ROLE_KEY = mustEnv("SUPABASE_SERVICE_ROLE_KEY");
-const ENCRYPTION_KEY = mustEnv("ENCRYPTION_KEY");
-
-// Binance
-const BINANCE_BASE_URL = (process.env.BINANCE_FUTURES_BASE_URL || "https://fapi.binance.com").trim();
-const USE_TESTNET = (process.env.USE_TESTNET || "false").trim() === "true";
-const MOCK_BINANCE_DATA = (process.env.MOCK_BINANCE_DATA || "false").trim() === "true";
-
-// Polling interval (2s requested)
-const INTERVAL_MS = Number(process.env.WORKER_INTERVAL_MS || 2000);
-
-// Reduce payload risk
-const MAX_ASSETS = Number(process.env.MAX_ASSETS || 50);
-const MAX_POSITIONS = Number(process.env.MAX_POSITIONS || 50);
-
-// -------------------- CLIENTS --------------------
-const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-const binancePublic: AxiosInstance = axios.create({
-    baseURL: BINANCE_BASE_URL,
-    timeout: 10_000,
-});
-
-function binanceSigned(apiKey: string): AxiosInstance {
-    return axios.create({
-        baseURL: BINANCE_BASE_URL,
-        timeout: 10_000,
-        headers: { "X-MBX-APIKEY": apiKey },
-    });
-}
-
-// -------------------- LOGGING --------------------
-function logHeader() {
-    console.log("-----------------------------------------");
-    console.log("XChangeRate Trading Worker Booting...");
-    console.log(`Worker Config: [BaseURL: ${BINANCE_BASE_URL}] [Testnet: ${USE_TESTNET}] [MockMode: ${MOCK_BINANCE_DATA}]`);
-    console.log(`Interval: ${INTERVAL_MS}ms | MAX_ASSETS=${MAX_ASSETS} | MAX_POSITIONS=${MAX_POSITIONS}`);
-    console.log("-----------------------------------------");
-}
-
-function decodeJWT(token: string): any {
-    try {
-        const parts = token.split(".");
-        if (parts.length !== 3) return null;
-        return JSON.parse(Buffer.from(parts[1], "base64").toString());
-    } catch {
-        return null;
-    }
-}
-
-function serializeAny(err: any) {
-    try {
-        return JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
-    } catch {
-        return String(err);
-    }
-}
-
-function logError(prefix: string, err: any) {
-    console.error(`❌ ${prefix}`);
-
-    // Axios
-    if (err && (err as AxiosError).isAxiosError) {
-        const ax = err as AxiosError<any>;
-        if (ax.response) {
-            console.error(`HTTP Status: ${ax.response.status}`);
-            console.error(`Data: ${JSON.stringify(ax.response.data, null, 2)}`);
-        } else {
-            console.error(`Axios Message: ${ax.message}`);
-        }
-        console.error(`Axios Full: ${serializeAny(ax)}`);
-        return;
-    }
-
-    // Supabase/PostgREST
-    if (err?.code && err?.message) {
-        console.error(`Supabase Error [${err.code}]: ${err.message}`);
-        if (err.details !== undefined) console.error(`Details: ${err.details}`);
-        if (err.hint !== undefined) console.error(`Hint: ${err.hint}`);
-        console.error(`Supabase Full: ${serializeAny(err)}`);
-        return;
-    }
-
-    // Generic
-    if (err instanceof Error) {
-        console.error(`Message: ${err.message}`);
-        console.error(`Stack: ${err.stack}`);
-        console.error(`Error Full: ${serializeAny(err)}`);
-        return;
-    }
-
-    console.error(`Raw Error: ${serializeAny(err)}`);
-}
-
-function isPrintable(str: string) {
-    return /^[\x20-\x7E]+$/.test(str);
-}
-
-// -------------------- CRYPTO --------------------
-function decryptAES(cipherText: string, key: string): string {
-    try {
-        const bytes = CryptoJS.AES.decrypt(cipherText, key);
-        return bytes.toString(CryptoJS.enc.Utf8).trim();
-    } catch {
-        return "";
-    }
-}
-
-function validateSecrets(sessionName: string, apiKey: string, apiSecret: string) {
-    if (!apiKey || apiKey.length < 10) throw new Error(`[${sessionName}] Decrypted apiKey invalid/empty`);
-    if (!apiSecret || apiSecret.length < 20) throw new Error(`[${sessionName}] Decrypted apiSecret too short (${apiSecret?.length || 0})`);
-    if (!isPrintable(apiSecret)) throw new Error(`[${sessionName}] Decrypted apiSecret has non-printable chars (decrypt mismatch)`);
-}
-
-// -------------------- BINANCE SIGNING --------------------
-function buildQuery(params: Record<string, string | number | boolean>): string {
-    const entries = Object.entries(params).sort(([a], [b]) => a.localeCompare(b));
-    return entries
-        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
-        .join("&");
-}
-
-function signQuery(query: string, apiSecret: string): string {
-    return crypto.createHmac("sha256", apiSecret).update(query).digest("hex");
-}
-
-async function getServerTime(): Promise<number> {
-    try {
-        const res = await binancePublic.get("/fapi/v1/time");
-        const t = res.data?.serverTime;
-        return typeof t === "number" ? t : Date.now();
-    } catch {
-        return Date.now();
-    }
-}
-
-async function signedGet<T>(
-    client: AxiosInstance,
-    endpointPath: string,
-    apiSecret: string,
-    baseParams: Record<string, string | number | boolean>,
-    timestamp: number
-): Promise<T> {
-    const params = { ...baseParams, timestamp, recvWindow: 5000 };
-    const query = buildQuery(params);
-    const signature = signQuery(query, apiSecret);
-    const url = `${endpointPath}?${query}&signature=${signature}`;
-    const res = await client.get(url);
-    return res.data as T;
-}
-
-// -------------------- SNAPSHOT --------------------
-type Snapshot = {
-    ts: string;
-    assets: any[];
-    positions: any[];
-    totalWalletBalance?: string | number;
-    totalUnrealizedProfit?: string | number;
-    totalMarginBalance?: string | number;
+// ------------------------------------------------------------
+// 1. CONFIG & ENV
+// ------------------------------------------------------------
+const CONFIG = {
+    SUPABASE_URL: mustEnv("NEXT_PUBLIC_SUPABASE_URL"),
+    SUPABASE_SERVICE_ROLE_KEY: mustEnv("SUPABASE_SERVICE_ROLE_KEY"),
+    ENCRYPTION_KEY: mustEnv("ENCRYPTION_KEY"),
+    BINANCE_BASE_URL: process.env.BINANCE_FUTURES_BASE_URL || "https://fapi.binance.com",
+    USE_TESTNET: process.env.USE_TESTNET === "true",
+    MOCK_MODE: process.env.MOCK_BINANCE_DATA === "true",
+    INTERVAL_MS: Number(process.env.WORKER_INTERVAL_MS || 2000),
+    PORT: Number(process.env.PORT || 3000),
+    MAX_ASSETS: 50,
+    MAX_POSITIONS: 50,
 };
 
-async function fetchBinanceSnapshot(apiKey: string, apiSecret: string, sessionName: string): Promise<Snapshot> {
-    const client = binanceSigned(apiKey);
-    const timestamp = await getServerTime();
-
-    try {
-        // quick signed test
-        await signedGet(client, "/fapi/v2/account", apiSecret, {}, timestamp);
-
-        const account = await signedGet<any>(client, "/fapi/v2/account", apiSecret, {}, timestamp);
-        const positions = await signedGet<any[]>(client, "/fapi/v2/positionRisk", apiSecret, {}, timestamp);
-
-        const activeAssets = Array.isArray(account?.assets)
-            ? account.assets.filter((a: any) => parseFloat(a?.walletBalance || "0") !== 0).slice(0, MAX_ASSETS)
-            : [];
-
-        const openPositions = Array.isArray(positions)
-            ? positions.filter((p: any) => parseFloat(p?.positionAmt || "0") !== 0).slice(0, MAX_POSITIONS)
-            : [];
-
-        return {
-            ts: new Date().toISOString(),
-            assets: activeAssets,
-            positions: openPositions,
-            totalWalletBalance: account?.totalWalletBalance,
-            totalUnrealizedProfit: account?.totalUnrealizedProfit,
-            totalMarginBalance: account?.totalMarginBalance,
-        };
-    } catch (err: any) {
-        logError(`[${sessionName}] Binance Fetch Failed`, err);
-        throw err;
-    }
-}
-
-// -------------------- STARTUP CHECK --------------------
-async function checkConnectivity() {
-    console.log("Checking public connectivity to Binance...");
-    try {
-        const res = await binancePublic.get("/fapi/v1/exchangeInfo");
-        console.log(`✅ Connectivity OK: [ExchangeInfo Status: ${res.status}] [Symbols: ${res.data?.symbols?.length ?? 0}]`);
-    } catch (err: any) {
-        logError("Connectivity Failed (check BINANCE_FUTURES_BASE_URL)", err);
+function mustEnv(name: string): string {
+    const v = process.env[name]?.trim();
+    if (!v) {
+        console.error(`❌ CRITICAL: Missing required env ${name}`);
         process.exit(1);
     }
+    return v;
 }
 
-// -------------------- DB HELPERS --------------------
-async function insertSnapshot(session: Database["public"]["Tables"]["api_credentials"]["Row"], snapshot: Snapshot, sessionName: string) {
-    const payload = {
-        user_id: session.user_id,
-        session_id: session.id,
-        exchange: session.exchange || "Binance",
-        snapshot: snapshot as any,
-    } as any;
-
-    const { data, error } = await supabase
-        .from("account_snapshots")
-        .insert(payload)
-        .select("id")
-        .single();
-
-    if (error) {
-        logError(`[${sessionName}] Supabase insert(account_snapshots) failed`, error);
-        throw error;
+// ------------------------------------------------------------
+// 2. LOGGER & UTILS
+// ------------------------------------------------------------
+const Logger = {
+    info: (msg: string) => console.log(`[${new Date().toISOString()}] INFO: ${msg}`),
+    warn: (msg: string) => console.warn(`[${new Date().toISOString()}] WARN: ${msg}`),
+    error: (msg: string, err?: any) => {
+        console.error(`[${new Date().toISOString()}] ❌ ERROR: ${msg}`);
+        if (err) {
+            if (err.isAxiosError) {
+                console.error(`   API Error: ${err.response?.status} - ${JSON.stringify(err.response?.data)}`);
+            } else {
+                console.error(`   Details: ${err.message || JSON.stringify(err)}`);
+            }
+        }
+    },
+    diag: (sessionName: string, err: any) => {
+        if (err?.response?.data?.code === -2015) {
+            console.error(`\n💡 DIAGNOSIS for [${sessionName}]: -2015 Invalid API Key/IP`);
+            console.error(`   1. Check if Futures trading is enabled on this key.`);
+            console.error(`   2. If IP whitelisting is ON, add this server's IP.`);
+            console.error(`   3. Ensure you are not using Testnet keys on Mainnet (or vice versa).`);
+            console.error(`   4. Verify decryption is working (ENCRYPTION_KEY must match).`);
+        }
     }
+};
 
-    return data as any;
-}
+// ------------------------------------------------------------
+// 3. CRYPTO
+// ------------------------------------------------------------
+const Crypto = {
+    decrypt: (cipher: string) => {
+        try {
+            const bytes = CryptoJS.AES.decrypt(cipher, CONFIG.ENCRYPTION_KEY);
+            return bytes.toString(CryptoJS.enc.Utf8).trim();
+        } catch {
+            return "";
+        }
+    },
+    isPrintable: (str: string) => /^[\x20-\x7E]+$/.test(str)
+};
 
-/**
- * Optional: update api_credentials tracking fields ONLY if columns exist.
- * (Safe mode: do nothing unless you enable it)
- */
-const ENABLE_SESSION_TRACKING = (process.env.ENABLE_SESSION_TRACKING || "false").trim() === "true";
+// ------------------------------------------------------------
+// 4. SUPABASE REPO
+// ------------------------------------------------------------
+const supabase = createClient<Database>(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_SERVICE_ROLE_KEY);
 
-async function updateSessionTracking(sessionId: string, updates: Record<string, any>, sessionName: string) {
-    if (!ENABLE_SESSION_TRACKING) return;
-
-    const { error } = await (supabase.from("api_credentials") as any).update(updates).eq("id", sessionId);
-    if (error) logError(`[${sessionName}] Supabase update(api_credentials) failed`, error);
-}
-
-// -------------------- MAIN LOOP --------------------
-let cycleRunning = false;
-
-async function performTradingCycle() {
-    if (cycleRunning) return;
-    cycleRunning = true;
-
-    console.log(`[${new Date().toISOString()}] Polling for active sessions...`);
-
-    try {
-        const { data: activeSessions, error } = await supabase
-            .from("api_credentials")
+const Repo = {
+    getActiveSessions: async () => {
+        const { data, error } = await (supabase
+            .from("api_credentials") as any)
             .select("*")
             .eq("status", "Active");
-
         if (error) throw error;
+        return data || [];
+    },
+    updateSessionStatus: async (id: string, updates: any) => {
+        await (supabase.from("api_credentials") as any).update(updates).eq("id", id);
+    },
+    logSnapshot: async (email: string, snapshot: any) => {
+        await (supabase.from("sessions_log") as any).insert({
+            email,
+            trades: snapshot // V2 stores snapshots in trades JSONB
+        });
+    },
+    logTrades: async (email: string, logs: any) => {
+        await (supabase.from("trades_log") as any).insert({
+            email,
+            logs
+        });
+    }
+};
 
-        if (!activeSessions?.length) {
-            console.log("No active sessions found.");
+// ------------------------------------------------------------
+// 5. BINANCE CLIENT
+// ------------------------------------------------------------
+const Binance = {
+    getPublic: () => axios.create({ baseURL: CONFIG.BINANCE_BASE_URL, timeout: 5000 }),
+    getSigned: (apiKey: string) => axios.create({
+        baseURL: CONFIG.BINANCE_BASE_URL,
+        timeout: 5000,
+        headers: { "X-MBX-APIKEY": apiKey }
+    }),
+    sign: (query: string, secret: string) => crypto.createHmac("sha256", secret).update(query).digest("hex"),
+    getServerTime: async () => {
+        const res = await axios.get(`${CONFIG.BINANCE_BASE_URL}/fapi/v1/time`);
+        return res.data.serverTime;
+    }
+};
+
+// ------------------------------------------------------------
+// 6. TRADING ENGINE
+// ------------------------------------------------------------
+async function getAccountSnapshot(apiKey: string, apiSecret: string, sessionName: string): Promise<any> {
+    const client = Binance.getSigned(apiKey);
+    const ts = await Binance.getServerTime();
+
+    const params = `timestamp=${ts}&recvWindow=5000`;
+    const signature = Binance.sign(params, apiSecret);
+    const url = `/fapi/v2/account?${params}&signature=${signature}`;
+
+    const res = await client.get(url);
+    const acc = res.data;
+
+    // Position risk
+    const posRes = await client.get(`/fapi/v2/positionRisk?${params}&signature=${signature}`);
+    const positions = posRes.data.filter((p: any) => parseFloat(p.positionAmt) !== 0);
+
+    return {
+        ts: new Date().toISOString(),
+        totalWalletBalance: acc.totalWalletBalance,
+        totalUnrealizedProfit: acc.totalUnrealizedProfit,
+        assets: acc.assets.filter((a: any) => parseFloat(a.walletBalance) !== 0).slice(0, CONFIG.MAX_ASSETS),
+        positions: positions.slice(0, CONFIG.MAX_POSITIONS)
+    };
+}
+
+function getMockSnapshot(): any {
+    return {
+        ts: new Date().toISOString(),
+        totalWalletBalance: (1000 + Math.random() * 100).toFixed(2),
+        totalUnrealizedProfit: (Math.random() * 50 - 25).toFixed(2),
+        assets: [{ asset: "USDT", walletBalance: "1000.00", unrealizedProfit: "5.00" }],
+        positions: [{ symbol: "BTCUSDT", positionAmt: "0.01", entryPrice: "50000", markPrice: "50500", unrealizedProfit: "5.00" }]
+    };
+}
+
+// ------------------------------------------------------------
+// 7. MAIN LOOP
+// ------------------------------------------------------------
+let cycleRunning = false;
+const sessionBackoffs: Record<string, number> = {};
+
+async function runCycle() {
+    if (cycleRunning) return;
+    cycleRunning = true;
+    Logger.info("Starting trading cycle...");
+
+    try {
+        const sessionsData = await Repo.getActiveSessions();
+        const sessions = sessionsData as any[];
+
+        if (sessions.length === 0) {
+            Logger.info("No active sessions found.");
             return;
         }
 
-        const sessions = activeSessions as Database["public"]["Tables"]["api_credentials"]["Row"][];
-
         for (const session of sessions) {
-            const name = session.name || session.id || "session";
+            // Check backoff (e.g., skip if failed in last 30s)
+            const now = Date.now();
+            if (sessionBackoffs[session.id] && now < sessionBackoffs[session.id]) {
+                continue;
+            }
 
+            const name = session.name || session.id;
             try {
-                const ex = String(session.exchange || "").toLowerCase();
-                if (ex && !ex.includes("binance")) {
-                    console.log(`[${name}] Skipping non-binance exchange: ${session.exchange}`);
-                    continue;
-                }
+                let snapshot: any;
 
-                const apiKey = decryptAES(session.encrypted_api_key, ENCRYPTION_KEY).trim();
-                const apiSecret = decryptAES(session.encrypted_api_secret, ENCRYPTION_KEY).trim();
-                validateSecrets(name, apiKey, apiSecret);
-
-                console.log(`[${name}] Decrypted Key Prefix: ${apiKey.substring(0, 8)}...`);
-
-                let snapshotData: Snapshot;
-
-                if (MOCK_BINANCE_DATA) {
-                    console.log(`[${name}] Mocking Binance data...`);
-                    snapshotData = {
-                        ts: new Date().toISOString(),
-                        assets: [{ asset: "USDT", walletBalance: "1000.00", unrealizedProfit: "50.00" }],
-                        positions: [{ symbol: "BTCUSDT", positionAmt: "0.1", entryPrice: "50000", unrealizedProfit: "50.00" }],
-                        totalWalletBalance: "1000.00",
-                        totalUnrealizedProfit: "50.00",
-                    };
+                if (CONFIG.MOCK_MODE) {
+                    snapshot = getMockSnapshot();
                 } else {
-                    console.log(`[${name}] Fetching Binance snapshot...`);
-                    snapshotData = await fetchBinanceSnapshot(apiKey, apiSecret, name);
-                    console.log(`[${name}] Snapshot OK. Balance: ${snapshotData.totalWalletBalance}`);
+                    const apiKey = Crypto.decrypt(session.api_key);
+                    const apiSecret = Crypto.decrypt(session.api_secret);
+
+                    if (!apiKey || !apiSecret || !Crypto.isPrintable(apiSecret)) {
+                        Logger.warn(`[${name}] Decryption failed for key: ${session.api_key?.substring(0, 10)}... (Check ENCRYPTION_KEY)`);
+                        throw new Error("Decryption failed or invalid key format");
+                    }
+
+                    snapshot = await getAccountSnapshot(apiKey, apiSecret, name);
                 }
 
-                console.log(`[${name}] Inserting snapshot into Supabase...`);
-                const inserted = await insertSnapshot(session, snapshotData, name);
+                // Write to Supabase V2 Schema
+                await Repo.logSnapshot(session.email, snapshot);
 
-                console.log(`✅ [${name}] Snapshot stored (ID: ${inserted?.id}). Balance: ${snapshotData.totalWalletBalance}`);
+                // Sync IPs if full_ips exists
+                const fullIps = session.full_ips as any[];
+                const derivedIps = Array.isArray(fullIps) ? fullIps.map((p: any) => p.ip).filter(Boolean) : [];
 
-                // Optional tracking if you add columns later
-                await updateSessionTracking(
-                    session.id,
-                    { last_sync_at: new Date().toISOString(), last_error: null },
-                    name
-                );
+                // Update session state
+                await Repo.updateSessionStatus(session.id, {
+                    last_sync_at: new Date().toISOString(),
+                    last_error: null,
+                    ips: derivedIps.length > 0 ? derivedIps : session.ips
+                });
+
+                Logger.info(`✅ [${name}] Updated. Balance: ${snapshot.totalWalletBalance}`);
+                delete sessionBackoffs[session.id];
+
             } catch (err: any) {
-                logError(`[${name}] Cycle entry failed`, err);
+                Logger.error(`[${name}] Cycle failed`, err);
+                Logger.diag(name, err);
 
-                await updateSessionTracking(
-                    session.id,
-                    { last_error: err?.message || String(err) },
-                    name
-                );
+                // Set backoff to 30s
+                sessionBackoffs[session.id] = Date.now() + 30000;
+
+                await Repo.updateSessionStatus(session.id, {
+                    last_error: err?.response?.data?.msg || err.message || "Unknown error"
+                });
             }
         }
-    } catch (err: any) {
-        logError("Worker cycle error", err);
+    } catch (err) {
+        Logger.error("Cycle exploded", err);
     } finally {
         cycleRunning = false;
     }
 }
 
-// -------------------- BOOT --------------------
-async function boot() {
-    logHeader();
-
-    const payload = decodeJWT(SUPABASE_SERVICE_ROLE_KEY);
-    const role = payload?.role || "unknown";
-    console.log(`Supabase Role Check: [Role: ${role}]`);
-
-    if (role !== "service_role") {
-        console.error("❌ CRITICAL: SUPABASE_SERVICE_ROLE_KEY is not a service_role key!");
-        process.exit(1);
+// ------------------------------------------------------------
+// 8. API HANDLER
+// ------------------------------------------------------------
+async function handleApiRequest(req: http.IncomingMessage, res: http.ServerResponse) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        res.writeHead(401);
+        res.end(JSON.stringify({ message: "Unauthorized" }));
+        return;
     }
 
-    await checkConnectivity();
-    await performTradingCycle();
-    setInterval(performTradingCycle, INTERVAL_MS);
+    const token = authHeader.split(" ")[1];
+
+    // 1. Verify user with Supabase
+    const { data: { user }, error: authError } = await (supabase.auth as any).getUser(token);
+    if (authError || !user) {
+        res.writeHead(401);
+        res.end(JSON.stringify({ message: "Invalid session" }));
+        return;
+    }
+
+    // 2. Get active session for user
+    const { data: sessions, error: dbError } = await (supabase
+        .from("api_credentials") as any)
+        .select("*")
+        .eq("email", user.email)
+        .eq("status", "Active")
+        .limit(1);
+
+    if (dbError || !sessions || sessions.length === 0) {
+        res.writeHead(404);
+        res.end(JSON.stringify({ message: "No active trading session found for this user" }));
+        return;
+    }
+
+    const session = sessions[0];
+    const apiKey = Crypto.decrypt(session.api_key);
+    const apiSecret = Crypto.decrypt(session.api_secret);
+
+    // 3. Route specific logic
+    const path = req.url || "";
+    let data: any = null;
+
+    if (path.includes("/get-account") || path.includes("/get-balance") || path.includes("/get-position")) {
+        if (CONFIG.MOCK_MODE) {
+            data = getMockSnapshot();
+        } else {
+            data = await getAccountSnapshot(apiKey, apiSecret, session.name);
+        }
+    } else if (path.includes("/close-positions")) {
+        // Simple success mock for now, actual implementation would close positions via Binance
+        data = { success: true, message: "Close command accepted" };
+    } else {
+        res.writeHead(404);
+        res.end(JSON.stringify({ message: "Endpoint not found" }));
+        return;
+    }
+
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(data));
 }
 
-boot().catch((e) => {
-    logError("Worker boot failed", e);
-    process.exit(1);
-});
+// ------------------------------------------------------------
+// 9. RENDER HEALTH SERVER
+// ------------------------------------------------------------
+function startHealthServer() {
+    const server = http.createServer((req, res) => {
+        const { method, url } = req;
 
-// Graceful shutdown
-process.on("SIGTERM", () => {
-    console.log("SIGTERM received: closing worker");
-    process.exit(0);
-});
-process.on("SIGINT", () => {
-    console.log("SIGINT received: closing worker");
-    process.exit(0);
+        // CORS
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+        if (method === 'OPTIONS') {
+            res.writeHead(204);
+            res.end();
+            return;
+        }
+
+        if (url === "/health") {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ ok: true, ts: new Date().toISOString(), mode: CONFIG.MOCK_MODE ? "MOCK" : "PROD" }));
+            return;
+        }
+
+        // Generic API Handler (Extremely simplified for stability)
+        if (url?.startsWith("/api/")) {
+            handleApiRequest(req, res).catch(err => {
+                Logger.error(`API Error: ${url}`, err);
+                res.writeHead(500, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ message: err.message || "Internal Server Error" }));
+            });
+            return;
+        }
+
+        res.writeHead(404);
+        res.end();
+    });
+
+    server.on("error", (err: any) => {
+        if (err.code === "EADDRINUSE") {
+            Logger.warn(`Health server port ${CONFIG.PORT} already in use. Skipping health server...`);
+        } else {
+            Logger.error("Health server failed", err);
+        }
+    });
+
+    server.listen(CONFIG.PORT, () => {
+        Logger.info(`Health server listening on port ${CONFIG.PORT}`);
+    });
+}
+
+// ------------------------------------------------------------
+// 9. BOOT
+// ------------------------------------------------------------
+async function boot() {
+    Logger.info("XChangeRate Worker Booting...");
+
+    // Print Public IP hint for whitelisting
+    try {
+        const ipRes = await axios.get("https://api.ipify.org?format=json");
+        Logger.info(`Egress Public IP: ${ipRes.data.ip} (Add to Binance whitelist if needed)`);
+    } catch {
+        Logger.warn("Could not detect public IP");
+    }
+
+    startHealthServer();
+
+    // Initial run
+    await runCycle();
+
+    // Schedule
+    setInterval(runCycle, CONFIG.INTERVAL_MS);
+}
+
+boot().catch(err => {
+    Logger.error("Boot failed", err);
+    process.exit(1);
 });

@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { RefreshCcw, Pause, Play, Copy, X, Trash2 } from "lucide-react";
+import { dedupedToast } from "@/lib/toastDeduper";
+import { xcrClient } from "@/lib/xcrClient";
 
 interface ConfigSessionCardProps {
     session: any;
+    onUpdate?: () => void;
 }
 
-const ConfigSessionCard = ({ session }: ConfigSessionCardProps) => {
+const ConfigSessionCard = ({ session, onUpdate }: ConfigSessionCardProps) => {
     const isRunning = session.status === 'Active';
     const [autoRestart, setAutoRestart] = useState(true);
     const [isLoadingToggle, setIsLoadingToggle] = useState(false);
@@ -15,15 +18,15 @@ const ConfigSessionCard = ({ session }: ConfigSessionCardProps) => {
     const handleToggleStatus = async () => {
         setIsLoadingToggle(true);
         try {
-            const nextStatus = isRunning ? 'Inactive' : 'Active';
-            const res = await fetch(`/api/sessions/${session.id}/status`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: nextStatus })
-            });
-            if (!res.ok) throw new Error('Failed to toggle status');
-        } catch (err) {
+            const nextStatus = isRunning ? 'Paused' : 'Active';
+            const res = await xcrClient.post(`/api/proxy/sessions/update`, { id: session.id, status: nextStatus });
+
+            if (!res.ok) throw new Error(res.message || "Update failed");
+            dedupedToast.success(`Session ${nextStatus.toLowerCase()} successfully`);
+            if (onUpdate) onUpdate();
+        } catch (err: any) {
             console.error(err);
+            dedupedToast.error(err.message || "Failed to update status");
         } finally {
             setIsLoadingToggle(false);
         }
@@ -32,19 +35,33 @@ const ConfigSessionCard = ({ session }: ConfigSessionCardProps) => {
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this session?')) return;
         try {
-            const res = await fetch(`/api/sessions/${session.id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Failed to delete session');
-        } catch (err) {
+            const res = await xcrClient.post(`/api/proxy/sessions/delete`, { id: session.id });
+
+            if (!res.ok) throw new Error(res.message || "Delete failed");
+            dedupedToast.success("Session deleted");
+            if (onUpdate) onUpdate();
+        } catch (err: any) {
             console.error(err);
+            dedupedToast.error(err.message || "Failed to delete session");
         }
     };
 
+    const handleCloseSymbol = async () => {
+        try {
+            dedupedToast.loading("Closing positions...");
+            const res = await xcrClient.closePositions(session.id, "ALL");
+            if (res.ok) {
+                dedupedToast.success("Close command sent");
+            }
+        } catch (err) { }
+    };
+
     const details = [
-        { label: "API Key", value: session.api_key_masked || "abc123xyz789..." },
-        { label: "Exchange", value: session.exchange, isHighlighted: true },
-        { label: "Created", value: new Date(session.created_at).toLocaleString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') },
-        { label: "Uptime", value: session.uptime || "3d 04h 18m" },
-        { label: "Total Trades", value: session.total_trades || "47" }
+        { label: "API Key", value: session.api_key_masked || "—" },
+        { label: "Target %", value: `${session.target_percentage || 100}%`, isHighlighted: true },
+        { label: "Created", value: session.created_at ? new Date(session.created_at).toLocaleString() : "—" },
+        { label: "IPs", value: Array.isArray(session.ips) ? session.ips.join(', ') : "None" },
+        { label: "Status", value: session.status }
     ];
 
     return (
@@ -110,7 +127,10 @@ const ConfigSessionCard = ({ session }: ConfigSessionCardProps) => {
                     <span>IPS</span>
                 </button>
 
-                <button className="flex items-center justify-center space-x-2 py-3 rounded-lg border border-blue-500/20 dark:border-blue-500/20 bg-blue-500/5 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-500/10 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">
+                <button
+                    onClick={handleCloseSymbol}
+                    className="flex items-center justify-center space-x-2 py-3 rounded-lg border border-blue-500/20 dark:border-blue-500/20 bg-blue-500/5 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-500/10 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                >
                     <X size={14} />
                     <span>CLOSE</span>
                 </button>

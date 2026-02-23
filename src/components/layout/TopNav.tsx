@@ -34,7 +34,7 @@ const TopNav = () => {
     const navItems = [
         { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
         { label: "Api Config", href: "/api-config", icon: Settings2 },
-        { label: "Live Status", href: "/snapshots", icon: Activity },
+        { label: "Live Status", href: "/sessions", icon: Activity },
         { label: "Community", href: "/community", icon: Users2 },
         { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
     ];
@@ -56,6 +56,7 @@ const TopNav = () => {
                         alt="Arizona High Logo"
                         fill
                         className="object-contain"
+                        sizes="96px"
                     />
                 </div>
             </Link>

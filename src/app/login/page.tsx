@@ -35,6 +35,10 @@ export default function LoginPage() {
             if (signInError) {
                 setError(signInError.message);
             } else {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.access_token) {
+                    localStorage.setItem('xcr_token', session.access_token);
+                }
                 router.push("/dashboard");
                 router.refresh();
             }

@@ -58,11 +58,27 @@ export async function updateSession(request: NextRequest) {
 
     const protectedRoutes = ['/dashboard', '/api-config', '/sessions', '/community', '/leaderboard', '/performance', '/profile', '/billing', '/settings', '/admin']
     const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))
+    const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
 
     if (isProtectedRoute && !user) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
         return NextResponse.redirect(url)
+    }
+
+    if (isAdminRoute && user) {
+        // Fetch profile to check is_admin
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single()
+
+        if (!profile?.is_admin) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/dashboard'
+            return NextResponse.redirect(url)
+        }
     }
 
     return response

@@ -1,142 +1,169 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Wallet, LineChart, TrendingUp } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { TrendingUp } from "lucide-react";
 import ExchangeTabs from "@/components/dashboard/ExchangeTabs";
 import MetricCard from "@/components/dashboard/MetricCard";
 import SessionCard from "@/components/dashboard/SessionCard";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { xcrClient } from "@/lib/xcrClient";
+
+const POLL_INTERVAL_MS = 10_000;
 
 export default function DashboardPage() {
-    const { supabase, user } = useAuth();
-    const [activeExchange, setActiveExchange] = useState<'Binance' | 'Bybit' | 'OKX'>('Binance');
+    const { user } = useAuth();
+    const [activeExchange, setActiveExchange] = useState<"Binance" | "Bybit" | "OKX">("Binance");
     const [sessions, setSessions] = useState<any[]>([]);
+    const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
     const [positions, setPositions] = useState<any[]>([]);
-    const [balances, setBalances] = useState<any[]>([]);
+    const [accountSnap, setAccountSnap] = useState<any>(null);
+    const [trades, setTrades] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-    const [hasMounted, setHasMounted] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<string>("");
+    const [isMounted, setIsMounted] = useState(false);
 
-    const fetchDashboardData = async () => {
+    const [debugInfo, setDebugInfo] = useState<{ status: number; error?: string; count: number } | null>(null);
+    const pollingRef = useRef(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        setLastUpdated(new Date().toLocaleTimeString());
+    }, []);
+
+    // ── 1. Fetch sessions via Proxy ────────────────────────────
+    const fetchSessions = useCallback(async () => {
         if (!user) return;
-
-        setIsLoading(true);
         try {
-            // Fetch credentials (sessions)
-            const { data: sessionsData } = await supabase
-                .from('api_credentials')
-                .select('*')
-                .eq('user_id', user.id);
+            const res = await xcrClient.getProxySessions();
+            if (res.ok && res.sessions) {
+                const fetchedSessions = res.sessions;
+                setSessions(fetchedSessions);
 
-            // Fetch latest snapshots
-            const { data: latestSnaps } = await supabase
-                .from('account_snapshots')
-                .select('*')
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false });
+                // Set default active session if none set
+                if (fetchedSessions.length > 0 && !activeSessionId) {
+                    const activeOnes = fetchedSessions.filter((s: any) => s.status === "Active");
+                    setActiveSessionId(activeOnes.length > 0 ? activeOnes[0].id : fetchedSessions[0].id);
+                }
+            }
+        } catch (err) {
+            console.error("[Dashboard] Session fetch failed:", err);
+        }
+    }, [user, activeSessionId]);
 
-            // Group by session and take the latest
-            const snapMap: Record<string, any> = {};
-            if (latestSnaps) {
-                latestSnaps.forEach(snap => {
-                    if (!snapMap[snap.session_id]) {
-                        snapMap[snap.session_id] = snap.snapshot;
-                    }
+    // ── 2. Fetch live data ONLY if sessionId exists ───────────
+    const fetchLiveData = useCallback(async () => {
+        if (!user || !activeSessionId) return;
+
+        try {
+            // Fetch account and position data in parallel via proxy
+            const [accountRes, posRes] = await Promise.all([
+                xcrClient.getAccount(activeSessionId),
+                xcrClient.getPositions(activeSessionId)
+            ]);
+
+            if (accountRes.ok && accountRes.data) {
+                setAccountSnap(accountRes.data);
+            }
+            if (posRes.ok) {
+                setPositions(posRes.positions || []);
+                setDebugInfo({
+                    status: posRes.status,
+                    count: posRes.positions?.length || 0
+                });
+            } else {
+                setDebugInfo({
+                    status: posRes.status,
+                    error: posRes.error || posRes.message,
+                    count: 0
                 });
             }
 
-            if (sessionsData) {
-                const merged = sessionsData.map(s => ({
-                    ...s,
-                    latest_snapshot: snapMap[s.id] || null
-                }));
-                setSessions(merged);
+        } catch (err: any) {
+            console.warn("[Dashboard] Live data refresh failed:", err);
+            setDebugInfo({ status: 500, error: err.message, count: 0 });
+        }
+    }, [user, activeSessionId]);
+
+    // ── 3. Fetch trades via Proxy ────────────────────────────
+    const fetchTrades = useCallback(async () => {
+        if (!user) return;
+        try {
+            const res = await xcrClient.getProxyTrades();
+            if (res.ok) setTrades(res.trades || []);
+        } catch (err) {
+            console.error("[Dashboard] Trades fetch failed:", err);
+        }
+    }, [user]);
+
+    const refreshAll = useCallback(async (isPolling = false) => {
+        if (pollingRef.current) return;
+        pollingRef.current = true;
+
+        if (!isPolling) setIsRefreshing(true);
+
+        try {
+            await fetchSessions();
+            if (activeSessionId) {
+                await fetchLiveData();
             }
-
-            // Fetch trades/positions
-            const { data: positionsData } = await supabase
-                .from('trades_log')
-                .select('*')
-                .eq('user_id', user.id)
-                .eq('status', 'OPEN');
-
-            if (positionsData) setPositions(positionsData);
-            setLastUpdated(new Date());
-
-        } catch (error) {
-            console.error("Dashboard fetch error:", error);
+            await fetchTrades();
+            setLastUpdated(new Date().toLocaleTimeString());
         } finally {
+            setIsRefreshing(false);
             setIsLoading(false);
+            pollingRef.current = false;
+        }
+    }, [fetchSessions, fetchLiveData, fetchTrades, activeSessionId]);
+
+    useEffect(() => {
+        if (!user) return;
+        refreshAll();
+
+        const interval = setInterval(() => {
+            if (document.visibilityState === "visible") {
+                refreshAll(true);
+            }
+        }, POLL_INTERVAL_MS);
+
+        return () => clearInterval(interval);
+    }, [user, refreshAll]);
+
+    const handleEmergencyShutdown = async () => {
+        if (!activeSessionId) return;
+        if (!confirm("Are you sure you want to CLOSE ALL open positions?")) return;
+
+        try {
+            await xcrClient.closePositions(activeSessionId, "ALL");
+            refreshAll();
+        } catch (err) {
+            // xcrClient handles toast
         }
     };
 
-    useEffect(() => {
-        setHasMounted(true);
-        if (!user) return;
-
-        fetchDashboardData();
-
-        // Realtime subscriptions
-        const channel = supabase
-            .channel('dashboard_updates')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'trades_log', filter: `user_id=eq.${user.id}` }, (payload) => {
-                fetchDashboardData();
-            })
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'api_credentials', filter: `user_id=eq.${user.id}` }, (payload) => {
-                fetchDashboardData();
-            })
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'account_snapshots', filter: `user_id=eq.${user.id}` }, (payload) => {
-                const newSnap = payload.new as any;
-                setSessions(prev => prev.map(s =>
-                    s.id === newSnap.session_id
-                        ? { ...s, latest_snapshot: newSnap.snapshot }
-                        : s
-                ));
-                setLastUpdated(new Date());
-            })
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [user, supabase]);
-
     const filteredSessions = sessions.filter(s => s.exchange === activeExchange);
-    const activeSessions = filteredSessions.filter(s => s.status === 'Active');
-
-    // Aggregation logic
-    let totalWallet = 0;
-    let totalUnrealizedPnl = 0;
-    let totalOpenPositions = 0;
-
-    activeSessions.forEach(s => {
-        const snap = s.latest_snapshot;
-        if (snap) {
-            totalWallet += parseFloat(snap.totalWalletBalance || "0");
-            totalUnrealizedPnl += parseFloat(snap.totalUnrealizedProfit || "0");
-            totalOpenPositions += (snap.positions?.length || 0);
-        }
-    });
-
-    const walletBalance = totalWallet;
-    const totalPnl = totalUnrealizedPnl;
-    const activeSessionsCount = activeSessions.length;
-
-    const filteredPositions = positions.filter(p => sessions.find(s => s.id === p.session_id)?.exchange === activeExchange);
-    const totalExposure = filteredPositions.reduce((acc, p) => acc + (Math.abs(Number(p.size || 0)) * Number(p.mark_price || p.entry_price || 0)), 0);
+    const activeCount = filteredSessions.filter(s => s.status === "Active").length;
+    const totalBalance = parseFloat(accountSnap?.totalWalletBalance || "0");
+    const totalPnl = parseFloat(accountSnap?.totalUnrealizedProfit || "0");
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500 px-6 md:px-12 min-h-screen bg-background dark:bg-[#050A12] pb-10 pt-20">
+        <div className="space-y-6 px-6 md:px-12 pb-10 pt-20">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-black text-slate-950 dark:text-white uppercase tracking-tight">Main Dashboard</h2>
-                    <div className="flex items-center space-x-2 mt-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-[#9FB0C7]/40 uppercase tracking-widest">
-                            Live Stream Active • Last sync: {hasMounted ? lastUpdated.toLocaleTimeString() : '--:--:--'}
-                        </span>
-                    </div>
+                    <h2 className="text-xl font-black text-slate-950 dark:text-white uppercase tracking-tight">
+                        Dashboard Terminal
+                    </h2>
+                    <p className="text-[10px] font-bold text-[#9FB0C7]/40 uppercase tracking-widest mt-1">
+                        Last sync: {isMounted ? lastUpdated : "--:--:--"} • {activeCount} active nodes
+                    </p>
                 </div>
+                <button
+                    onClick={handleEmergencyShutdown}
+                    disabled={!activeSessionId}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 shadow-lg shadow-red-500/20"
+                >
+                    Emergency Shutdown
+                </button>
             </div>
 
             <ExchangeTabs
@@ -144,87 +171,52 @@ export default function DashboardPage() {
                 onExchangeChange={setActiveExchange}
             />
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <MetricCard
-                    label="P&L"
-                    value={`${totalPnl >= 0 ? '+' : ''}${totalPnl.toFixed(2)}`}
-                />
-                <MetricCard
-                    label="WALLET"
-                    value={walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                />
-                <MetricCard
-                    label="SESSIONS"
-                    value={`${activeSessionsCount} / ${filteredSessions.length} live`}
-                />
-                <MetricCard
-                    label="POSITIONS"
-                    value={totalOpenPositions.toString()}
-                />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <MetricCard label="BALANCE" value={totalBalance.toFixed(2)} />
+                <MetricCard label="U.P&L" value={(totalPnl >= 0 ? "+" : "") + totalPnl.toFixed(2)} />
+                <MetricCard label="ACTIVE NODES" value={`${activeCount}/${filteredSessions.length}`} />
+                <MetricCard label="CHANNELS" value={String(positions.length)} />
             </div>
 
-            <div className="flex items-center justify-between pt-6 pb-2">
-                <div className="flex items-center space-x-3">
-                    <h3 className="text-[12px] font-black text-slate-950 dark:text-white uppercase tracking-[0.2em]">Account Summary</h3>
-                    <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 text-[9px] font-black text-slate-950 dark:text-[#9FB0C7]/40 uppercase tracking-widest leading-none">
-                        {filteredSessions.length} sessions
-                    </span>
-                </div>
-                <div className="text-right">
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-[#9FB0C7]/40 uppercase tracking-widest leading-none">Combined P&L: </span>
-                    <span className={`text-[11px] font-bold ${totalPnl >= 0 ? 'text-emerald-500 dark:text-[#22D3A6]' : 'text-red-500'} tracking-tighter ml-1`}>
-                        {totalPnl >= 0 ? '+' : ''}{totalPnl.toFixed(4)}
-                    </span>
-                </div>
-            </div>
-
-            <div className="space-y-6">
-                {filteredSessions.length > 0 ? (
-                    filteredSessions.map(session => (
-                        <div key={session.id} className="space-y-6">
-                            <SessionCard
-                                session={session}
-                                positions={positions.filter(p => p.session_id === session.id)}
-                            />
-
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-4">
-                                    <h3 className="text-[12px] font-black text-slate-950 dark:text-white uppercase tracking-[0.2em]">Trading Activity</h3>
-                                    <div className="flex items-center space-x-3">
-                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-white/5 text-[9px] font-black text-slate-950 dark:text-white/60 uppercase tracking-widest">
-                                            {positions.filter(p => p.session_id === session.id).length} positions
-                                        </span>
-                                        <div className="flex items-center space-x-1.5">
-                                            <div className={`w-1.5 h-1.5 rounded-full ${session.status === 'Active' ? 'bg-[#22D3A6]' : 'bg-red-400'}`} />
-                                            <span className={`text-[10px] font-black ${session.status === 'Active' ? 'text-[#22D3A6]' : 'text-red-400'} uppercase tracking-widest`}>
-                                                {session.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-[11px] font-bold text-slate-500 dark:text-[#9FB0C7]/40 uppercase tracking-widest leading-none">Total Exposure: </span>
-                                    <span className="text-[12px] font-black text-slate-950 dark:text-white tracking-tighter ml-1">
-                                        ${totalExposure.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+            <div className="space-y-4">
+                {isLoading ? (
+                    <div className="p-12 flex flex-col items-center justify-center opacity-40">
+                        <div className="w-8 h-8 rounded-full border-t-2 border-blue-500 animate-spin mb-4" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Warming up nodes...</span>
+                    </div>
+                ) : filteredSessions.length > 0 ? (
+                    filteredSessions.map((session) => (
+                        <SessionCard
+                            key={session.id}
+                            session={session}
+                            positions={positions}
+                            isActive={session.id === activeSessionId}
+                            onSelect={() => setActiveSessionId(session.id)}
+                        />
                     ))
                 ) : (
-                    <div className="col-span-full glass-card p-12 flex flex-col items-center justify-center text-center space-y-3 border border-slate-200 dark:border-white/5 bg-white dark:bg-[#0A101A] shadow-sm dark:shadow-none">
-                        <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-400 dark:text-[#9FB0C7]/20">
-                            <TrendingUp size={24} />
-                        </div>
-                        <div className="space-y-0.5">
-                            <h4 className="text-slate-950 dark:text-white text-[11px] font-bold uppercase tracking-widest">No Active Sessions</h4>
-                            <p className="text-xs text-slate-500 dark:text-[#9FB0C7]/40 max-w-[300px]">
-                                Connect your API keys and deploy an AI strategy to start trading on {activeExchange}.
-                            </p>
-                        </div>
+                    <div className="bg-white/5 border border-white/5 rounded-2xl p-12 text-center">
+                        <TrendingUp size={32} className="mx-auto text-white/10 mb-4" />
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                            No sessions found for {activeExchange}. Config sessions to start trading.
+                        </p>
                     </div>
                 )}
             </div>
+
+            {/* Debug Panel (Dev Only) */}
+            {process.env.NODE_ENV === "development" && (
+                <div className="mt-12 p-4 bg-black/40 border border-white/5 rounded-xl font-mono text-[9px] text-[#9FB0C7]/40">
+                    <h5 className="mb-2 text-[#9FB0C7]/20 uppercase">Internal Proxy Debug</h5>
+                    <div className="space-y-1">
+                        <div>ACTIVE_SESSION: {activeSessionId || 'NONE'}</div>
+                        <div>POSITIONS_COUNT: {positions.length}</div>
+                        <div>LAST_STATUS: {debugInfo?.status || 'N/A'}</div>
+                        {debugInfo?.error && <div className="text-red-500/60 uppercase">ERROR: {debugInfo.error}</div>}
+                        <div>UPSTREAM_SYNC: {lastUpdated}</div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

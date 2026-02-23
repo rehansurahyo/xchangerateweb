@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import AuthProvider from "@/components/providers/AuthProvider";
 import ThemeProvider from "@/components/providers/ThemeProvider";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -30,6 +31,7 @@ export default function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
+                        <Toaster position="top-right" />
                         <DashboardLayout>{children}</DashboardLayout>
                     </ThemeProvider>
                 </AuthProvider>

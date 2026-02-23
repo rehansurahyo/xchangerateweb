@@ -50,22 +50,25 @@ export interface Database {
                     api_key_masked: string
                     encrypted_api_key: string
                     encrypted_api_secret: string
-                    proxies: Json
-                    target_percent: number
-                    status: 'Active' | 'Inactive'
+                    ips: string[]
+                    full_ips: Json
+                    target_percentage: number
+                    status: string
                     created_at: string
                 }
                 Insert: {
                     id?: string
                     user_id: string
+                    email: string
                     name: string
                     exchange: string
                     api_key_masked: string
                     encrypted_api_key: string
                     encrypted_api_secret: string
-                    proxies?: Json
-                    target_percent?: number
-                    status?: 'Active' | 'Inactive'
+                    ips?: string[]
+                    full_ips?: Json
+                    target_percentage?: number
+                    status?: string
                     created_at?: string
                 }
             }

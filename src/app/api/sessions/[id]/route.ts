@@ -17,7 +17,7 @@ export async function DELETE(
             .from('api_credentials')
             .delete()
             .eq('id', params.id)
-            .eq('user_id', user.id);
+            .eq('email', user.email);
 
         if (error) throw error;
 

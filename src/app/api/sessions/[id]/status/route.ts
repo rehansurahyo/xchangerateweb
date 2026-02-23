@@ -14,17 +14,32 @@ export async function PATCH(
         }
 
         const body = await request.json();
-        const { status } = body; // 'Active' | 'Inactive'
+        const { status } = body; // 'Active' | 'Paused'
 
-        if (!['Active', 'Inactive'].includes(status)) {
+        if (!['Active', 'Paused'].includes(status)) {
             return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
+        }
+
+        const updateData: any = { status };
+
+        if (status === 'Active') {
+            // Only set start_time if it's currently null
+            const { data: current } = await supabase
+                .from('api_credentials')
+                .select('start_time')
+                .eq('id', params.id)
+                .single();
+
+            if (current && !current.start_time) {
+                updateData.start_time = new Date().toISOString();
+            }
         }
 
         const { data, error } = await supabase
             .from('api_credentials')
-            .update({ status })
+            .update(updateData)
             .eq('id', params.id)
-            .eq('user_id', user.id)
+            .eq('email', user.email)
             .select();
 
         if (error) throw error;

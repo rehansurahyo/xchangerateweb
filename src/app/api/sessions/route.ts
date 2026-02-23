@@ -14,28 +14,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Fetch user subscription for plan limits
-        const { data: sub } = await supabase
-            .from('subscriptions')
-            .select('plan')
-            .eq('user_id', user.id)
-            .single();
-
-        const plan = sub?.plan || 'Free';
-        const limits: Record<string, number> = { 'Free': 3, 'Starter': 3, 'Pro': 10, 'Elite': 1000 };
-
-        // Check current session count
-        const { count } = await supabase
-            .from('api_credentials')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', user.id);
-
-        if (count !== null && count >= (limits[plan] || 1)) {
-            return NextResponse.json({ error: `Plan limit reached (${limits[plan]} sessions)` }, { status: 403 });
-        }
-
         const body = await request.json();
-        const { name, exchange, apiKey, apiSecret, proxies, target_percent } = body;
+        const { name, exchange, apiKey, apiSecret, target_percentage } = body;
 
         if (!name || !exchange || !apiKey || !apiSecret) {
             return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
@@ -45,24 +25,20 @@ export async function POST(request: Request) {
         const encryptedKey = CryptoJS.AES.encrypt(apiKey, ENCRYPTION_KEY).toString();
         const encryptedSecret = CryptoJS.AES.encrypt(apiSecret, ENCRYPTION_KEY).toString();
 
-        // Mask the key for display
-        const maskedKey = apiKey.length > 8
-            ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`
-            : '****';
-
         const { data, error } = await supabase
             .from('api_credentials')
             .insert([
                 {
-                    user_id: user.id,
+                    email: user.email,
                     name,
                     exchange,
-                    api_key_masked: maskedKey,
-                    encrypted_api_key: encryptedKey,
-                    encrypted_api_secret: encryptedSecret,
-                    proxies: proxies || [],
-                    target_percent: target_percent || 100,
-                    status: 'Inactive'
+                    api_key: encryptedKey,
+                    api_secret: encryptedSecret,
+                    target_percentage: target_percentage || 100,
+                    status: 'Paused',
+                    ips: [],
+                    full_ips: [],
+                    is_new: true
                 }
             ])
             .select();
@@ -90,8 +66,8 @@ export async function GET() {
 
         const { data, error } = await supabase
             .from('api_credentials')
-            .select('id, name, exchange, api_key_masked, status, created_at, target_percent')
-            .eq('user_id', user.id)
+            .select('*')
+            .eq('email', user.email)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
