@@ -238,4 +238,4 @@ OUTPUT FORMAT
   1) the exact file changes (paths + code snippets)
   2) any SQL for RLS policies
   3) a short “how to test” checklist
-- Keep code production-ready and consistent with existing project conventions.
+- Keep code production-ready and consistent with existing project conventions."# xchangerateweb" 
